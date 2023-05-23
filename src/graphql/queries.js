@@ -31,4 +31,18 @@ export const GET_PAYMENT_ACCOUNTS = gql`
   }
 `;
 
+export const GET_TRANSACTIONS = gql`
+  query GetTransactions($options: TransactionOptionsInput, $where: TransactionWhereInput) {
+    getTransactions(options: $options, where: $where ) {
+      docs {
+        _id
+        amount
+        name
+        date
+      }
+      totalPages
+    }
+  }
+`;
+
 // Additional queries...

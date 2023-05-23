@@ -20,14 +20,14 @@ import { CREATE_TRANSACTION } from '../graphql/mutations';
 const TransactionFormComponent = () => {
   const navigate = useNavigate();
   const toast = useToast();
-  const [formData, setFormData] = useState({
-    amount: '',
-    description: '',
-    name: '',
-    date: new Date().toISOString().split('T')[0],
-    type: '', // Add TransactionType field
-    paymentAccount: '', // Add paymentAccount field
-    status: '',
+  const [formData, setFormData] = useState({ 
+      amount: '',
+      description: '',
+      name: '',
+      date: new Date().toISOString().split('T')[0],
+      type: '',
+      paymentAccount: '',
+      status: '',
   });
 
   const { loading: enumTypeLoading, error: enumTypeError, data: enumTypeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
@@ -35,15 +35,29 @@ const TransactionFormComponent = () => {
   const { loading: paymentLoading, error: paymentError, data: paymentData } = useQuery(GET_PAYMENT_ACCOUNTS);
 
   const [createTransaction, { loading, error }] = useMutation(CREATE_TRANSACTION);
-
+  
   useEffect(() => {
     if (!enumTypeLoading && enumTypeData) {
       setFormData((prevData) => ({
         ...prevData,
-        transactionType: enumTypeData.__type.enumValues[0].name,
+        type: enumTypeData.__type.enumValues[0].name,
       }));
     }
-  }, [enumTypeLoading, enumTypeData]);
+  
+    if (!paymentLoading && paymentData && paymentData.getPaymentAccounts.docs.length > 0) {
+      setFormData((prevData) => ({
+        ...prevData,
+        paymentAccount: paymentData.getPaymentAccounts.docs[0]._id,
+      }));
+    }
+  
+    if (!enumStatusLoading && enumStatusData) {
+      setFormData((prevData) => ({
+        ...prevData,
+        status: enumStatusData.__type.enumValues[0].name,
+      }));
+    }
+  }, [enumTypeLoading, enumTypeData, paymentLoading, paymentData, enumStatusLoading, enumStatusData]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -70,12 +84,13 @@ const TransactionFormComponent = () => {
 
   const handleChange = (e) => {
     const { name: fieldName, value } = e.target;
+    const fieldValue = fieldName === 'amount' ? parseFloat(value) : value;
     setFormData((prevData) => ({
       ...prevData,
-      [fieldName]: value,
+      [fieldName]: fieldValue,
     }));
   };
-  console.log(enumTypeData);
+
   return (
     <Box maxW="container.sm" mx="auto" py={8}>
       <form onSubmit={handleSubmit}>
@@ -118,7 +133,7 @@ const TransactionFormComponent = () => {
         <FormControl mt={4}>
           <FormLabel>Transaction Type</FormLabel>
           <Select
-            name="transactionType"
+            name="type"
             value={formData.transactionType}
             onChange={handleChange}
           >
@@ -135,7 +150,7 @@ const TransactionFormComponent = () => {
           <FormLabel>Payment Account</FormLabel>
           <Select
             name="paymentAccount"
-            value={formData.paymentAccount}
+            value={formData.paymentAccount._id || ''}
             onChange={handleChange}
           >
             {!paymentLoading &&

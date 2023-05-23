@@ -9,7 +9,6 @@ export const CREATE_TRANSACTION = gql`
       name
       date
       type
-      paymentAccount
       status
     }
   }
