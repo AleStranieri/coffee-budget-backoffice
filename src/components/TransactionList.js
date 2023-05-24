@@ -6,7 +6,7 @@ import Pagination from './Pagination';
 import CustomDateField from './CustomDateField';
 import BadgeTransactionStatus from './BadgeTransactionStatus';
 
-const TransactionList = ({ page, pageLimit, onPageChange, status }) => {
+const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurring, filterStartDate, filterEndDate }) => {
     const [currentPage, setCurrentPage] = useState(1); 
   
     const variables = {
@@ -17,17 +17,44 @@ const TransactionList = ({ page, pageLimit, onPageChange, status }) => {
       },
     };
   
-    if (status) {
+    if (status !== '') {
       variables.where = {
+        ...variables.where,
         status,
       };
     }
+    
+    if (type !== '') {
+      variables.where = {
+        ...variables.where,
+        type,
+      };
+    }
+    
+    if (isRecurring !== '') {
+      variables.where = {
+        ...variables.where,
+        'isRecurring': isRecurring === 'true',
+      };
+    }
+
+    if (filterStartDate !== '') {
+      variables.where.executionDate = {
+        gte: filterStartDate,
+      };
+    }
+    
+    if (filterEndDate !== '') {
+      variables.where.executionDate = {
+        ...variables.where.executionDate,
+        lte: filterEndDate,
+      };
+    }
+    console.log(variables.where);
   
     const { loading, error, data } = useQuery(GET_TRANSACTIONS, {
       variables,
     });
-  
-  
 
   if (loading) {
     return <p>Loading...</p>;
@@ -68,6 +95,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status }) => {
             lineHeight='tight'
             noOfLines={1}
           >{transaction.name}</Box>
+          <Text>{transaction.paymentAccount.name}</Text>
           <Text>{transaction.amount}</Text>
           
           {/* Display other transaction details */}

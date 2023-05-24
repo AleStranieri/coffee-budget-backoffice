@@ -1,37 +1,90 @@
 import React, { useState } from 'react';
-import { Box, Text, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
+import { Box, Text, Select, Stack, Input, Button, InputGroup, InputLeftAddon } from '@chakra-ui/react';
 import TransactionList from '../components/TransactionList';
+import { useQuery } from '@apollo/client';
+import { GET_ENUM_TRANSACTIONSTATUS, GET_ENUM_TRANSACTIONTYPE } from '../graphql/queries';
 
 const Transactions = () => {
-  const [activeTab, setActiveTab] = useState(0);
+  const [filterStatus, setFilterStatus] = useState('');
+  const [filterType, setFilterType] = useState('');
+  const [filterStartDate, setFilterStartDate] = useState('');
+  const [filterEndDate, setFilterEndDate] = useState('');
+  const [filterRecurringType, setFilterRecurringType] = useState('');
+
+  // Fetch enum values for TransactionStatus and TransactionType
+  const { data: statusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
+  const { data: typeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
+
+  const transactionStatusValues = statusData?.__type?.enumValues || [];
+  const transactionTypeValues = typeData?.__type?.enumValues || [];
+  
+
+  const handleFilterSubmit = () => {
+    // Handle the filter submission here
+    // You can pass the filter values to the TransactionList component or perform any other filtering logic
+    // For example, in this case, we are logging the filter values
+    console.log('Filter Status:', filterStatus);
+    console.log('Filter Type:', filterType);
+    console.log('Filter Start Date:', filterStartDate);
+    console.log('Filter End Date:', filterEndDate);
+    console.log('Filter Recurring Transaction', filterRecurringType);
+  };
+
+  const handleDateChange = (dates) => {
+    const [startDate, endDate] = dates;
+    setFilterStartDate(startDate ? new Date(startDate) : '');
+    setFilterEndDate(endDate ? new Date(endDate) : '');
+  };
 
   return (
     <Box maxW="container.lg" mx="auto" py={8}>
       <Text fontSize="2xl" fontWeight="bold" mb={4}>
         Transactions
       </Text>
-      <Tabs isLazy defaultIndex={activeTab} onChange={setActiveTab}>
-        <TabList>
-          <Tab>All Transactions</Tab>
-          <Tab>Completed</Tab>
-          <Tab>Pending</Tab>
-          <Tab>Scheduled</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <TransactionList status={null} />
-          </TabPanel>
-          <TabPanel>
-            <TransactionList status="EXECUTED" />
-          </TabPanel>
-          <TabPanel>
-            <TransactionList status="PENDING" />
-          </TabPanel>
-          <TabPanel>
-            <TransactionList status="SCHEDULED" />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
+      <Stack direction="row" spacing={4} mb={4}>
+        <Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+          <option value="">All Status</option>
+          {transactionStatusValues.map((status) => (
+            <option key={status.name} value={status.name}>{status.name}</option>
+          ))}
+        </Select>
+        <Select value={filterType} onChange={(e) => setFilterType(e.target.value)}>
+          <option value="">All Type</option>
+          {transactionTypeValues.map((type) => (
+            <option key={type.name} value={type.name}>{type.name}</option>
+          ))}
+        </Select>
+        <Select value={filterRecurringType} onChange={(e) => setFilterRecurringType(e.target.value)}>
+          <option value="">All Transaction</option>
+          <option value={false}>Exclude Recurring Transaction</option>
+          <option value={true}>Only Recurring Transaction</option>
+        </Select>
+        <InputGroup>
+          <InputLeftAddon children='gte' />
+          <Input
+            type="date"
+            value={filterStartDate}
+            onChange={(e) => setFilterStartDate(e.target.value)}
+            placeholder="Start Date"
+          />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children='lte' />
+          <Input
+            type="date"
+            value={filterEndDate}
+            onChange={(e) => setFilterEndDate(e.target.value)}
+            placeholder="End Date"
+          />
+        </InputGroup>
+      </Stack>
+      <TransactionList
+        status={filterStatus}
+        type={filterType}
+        isRecurring={filterRecurringType}
+        filterStartDate={filterStartDate}
+        filterEndDate={filterEndDate}
+      />
     </Box>
   );
 };

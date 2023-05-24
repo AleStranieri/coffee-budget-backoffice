@@ -40,6 +40,9 @@ export const GET_TRANSACTIONS = gql`
         name
         date
         status
+        paymentAccount {
+          name
+        }
       }
       totalPages
     }
