@@ -4,6 +4,7 @@ import { useQuery } from '@apollo/client';
 import { GET_TRANSACTIONS } from '../graphql/queries';
 import Pagination from './Pagination';
 import CustomDateField from './CustomDateField';
+import BadgeTransactionStatus from './BadgeTransactionStatus';
 
 const TransactionList = ({ page, pageLimit, onPageChange, status }) => {
     const [currentPage, setCurrentPage] = useState(1); 
@@ -46,9 +47,29 @@ const TransactionList = ({ page, pageLimit, onPageChange, status }) => {
     <Box>
       {transactions.map((transaction) => (
         <Box key={transaction._id} bg="white" shadow="md" p={4} mb={4} borderRadius="md">
-          <Text>{transaction.name}</Text>
+          <Box display='flex' alignItems='baseline'> 
+            <BadgeTransactionStatus status={transaction.status} />
+            <Box
+              color='gray.500'
+              fontWeight='semibold'
+              letterSpacing='wide'
+              fontSize='xs'
+              textTransform='uppercase'
+              ml='2'
+            >
+              <CustomDateField timestamp={transaction.date}/>
+            </Box>
+          </Box>
+
+          <Box
+            mt='1'
+            fontWeight='semibold'
+            as='h4'
+            lineHeight='tight'
+            noOfLines={1}
+          >{transaction.name}</Box>
           <Text>{transaction.amount}</Text>
-          <CustomDateField timestamp={transaction.date}/>
+          
           {/* Display other transaction details */}
         </Box>
       ))}
