@@ -9,15 +9,18 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useMutation, useQuery, gql } from '@apollo/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   GET_ENUM_TRANSACTIONTYPE,
   GET_ENUM_TRANSACTIONSTATUS,
   GET_PAYMENT_ACCOUNTS,
+  GET_TRANSACTION,
 } from '../graphql/queries';
-import { CREATE_TRANSACTION } from '../graphql/mutations';
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from '../graphql/mutations';
 
 const TransactionFormComponent = () => {
+  const { id } = useParams(); // Get the id parameter from the URL
+  const isEditMode = !!id; // Check if it is edit mode or add mode
   const navigate = useNavigate();
   const toast = useToast();
   const [formData, setFormData] = useState({ 
@@ -29,45 +32,121 @@ const TransactionFormComponent = () => {
       paymentAccount: '',
       status: '',
   });
-
+  
+  const { loading: getTransactionLoading, error: getTransactionError, data: getTransactionData } = useQuery(GET_TRANSACTION, {
+    variables: {
+      transactionId: id // assuming you have the id from useParams
+    }
+  });
   const { loading: enumTypeLoading, error: enumTypeError, data: enumTypeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
   const { loading: enumStatusLoading, error: enumStatusError, data: enumStatusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
   const { loading: paymentLoading, error: paymentError, data: paymentData } = useQuery(GET_PAYMENT_ACCOUNTS);
 
   const [createTransaction, { loading, error }] = useMutation(CREATE_TRANSACTION);
+  const [updateTransaction, { updateLoading, updateError }] = useMutation(UPDATE_TRANSACTION);
   
   useEffect(() => {
-    if (!enumTypeLoading && enumTypeData) {
+    // If it is edit mode and data is fetched, set the initial values of the form fields
+    if (isEditMode && !getTransactionLoading && getTransactionData) {
       setFormData((prevData) => ({
         ...prevData,
-        type: enumTypeData.__type.enumValues[0].name,
+        date: new Date(getTransactionData.getTransaction.date/1).toISOString().split('T')[0],
       }));
-    }
-  
-    if (!paymentLoading && paymentData && paymentData.getPaymentAccounts.docs.length > 0) {
       setFormData((prevData) => ({
         ...prevData,
-        paymentAccount: paymentData.getPaymentAccounts.docs[0]._id,
+        amount: getTransactionData.getTransaction.amount,
       }));
-    }
-  
-    if (!enumStatusLoading && enumStatusData) {
+      if(getTransactionData.getTransaction.description) {
+        setFormData((prevData) => ({
+          ...prevData,
+          description: getTransactionData.getTransaction.description,
+        }));
+      }
       setFormData((prevData) => ({
         ...prevData,
-        status: enumStatusData.__type.enumValues[0].name,
+        name: getTransactionData.getTransaction.name,
+      }));
+      setFormData((prevData) => ({
+        ...prevData,
+        status: getTransactionData.getTransaction.status,
+      }));
+      setFormData((prevData) => ({
+        ...prevData,
+        type: getTransactionData.getTransaction.type,
+      }));
+      setFormData((prevData) => ({
+        ...prevData,
+        paymentAccount: getTransactionData.getTransaction.paymentAccount._id,
       }));
     }
-  }, [enumTypeLoading, enumTypeData, paymentLoading, paymentData, enumStatusLoading, enumStatusData]);
+
+    if(!isEditMode) {
+ 
+      if (!enumTypeLoading && enumTypeData) {
+        setFormData((prevData) => ({
+          ...prevData,
+          type: enumTypeData.__type.enumValues[0].name,
+        }));
+      }
+    
+      if (!paymentLoading && paymentData && paymentData.getPaymentAccounts.docs.length > 0) {
+        setFormData((prevData) => ({
+          ...prevData,
+          paymentAccount: paymentData.getPaymentAccounts.docs[0]._id,
+        }));
+      }
+    
+      if (!enumStatusLoading && enumStatusData) {
+        setFormData((prevData) => ({
+          ...prevData,
+          status: enumStatusData.__type.enumValues[0].name,
+        }));
+      }
+    }
+  }, [
+        isEditMode, 
+        getTransactionLoading,
+        getTransactionData, 
+        enumTypeLoading, 
+        enumTypeData, 
+        paymentLoading, 
+        paymentData, 
+        enumStatusLoading, 
+        enumStatusData
+      ]
+    );
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(id);
 
-    createTransaction({
-      variables: {
-        input: formData,
-      },
-    })
+    if(isEditMode) {
+      updateTransaction({
+        variables: {
+          updateTransactionId: id, 
+          input: formData
+        }
+      })
       .then((response) => {
+        console.log('Transaction updated:', response.data.updateTransaction);
+        toast({
+          title: 'Transaction updated',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        navigate('/transactions');
+      })
+      .catch((error) => {
+        console.error('Transaction creation error:', error);
+      });
+    } else {
+
+      createTransaction({
+        variables: {
+          input: formData,
+        },
+      }) .then((response) => {
         console.log('Transaction created:', response.data.createTransaction);
         toast({
           title: 'Transaction saved',
@@ -80,6 +159,9 @@ const TransactionFormComponent = () => {
       .catch((error) => {
         console.error('Transaction creation error:', error);
       });
+  
+    }
+      
   };
 
   const handleChange = (e) => {

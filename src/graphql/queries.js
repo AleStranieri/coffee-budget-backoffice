@@ -20,12 +20,24 @@ export const GET_ENUM_TRANSACTIONSTATUS = gql`
   }
 `;
 
-export const GET_PAYMENT_ACCOUNTS = gql`
-  query GetPaymentAccounts {
-    getPaymentAccounts {
+export const GET_CATEGORIES = gql`
+  query GetCategories {
+    getCategories {
       docs {
         _id
         name
+      }
+    }
+  }
+`;
+
+export const GET_PAYMENT_ACCOUNTS = gql`
+  query GetPaymentAccounts($options: PaymentAccountOptionsInput, $where: PaymentAccountWhereInput) {
+    getPaymentAccounts(options: $options, where: $where ) {
+      docs {
+        _id
+        name
+        type
       }
     }
   }
@@ -40,6 +52,7 @@ export const GET_TRANSACTIONS = gql`
         name
         date
         status
+        type
         paymentAccount {
           name
         }
@@ -47,6 +60,51 @@ export const GET_TRANSACTIONS = gql`
       totalPages
     }
   }
+`;
+
+export const GET_TRANSACTION = gql`
+query GetTransaction($transactionId: ID!) {
+    getTransaction(transactionId: $transactionId) {
+      _id
+      amount
+      categories {
+        _id
+        name
+      }
+      date
+      description
+      name
+      paymentAccount {
+        _id
+        name
+        type
+        ... on DebitAccount {
+          _id
+          amount
+          name
+          type
+        }
+        ... on CreditCardAccount {
+          _id
+          name
+          accountParent {
+            ... on CreditCardAccount {
+              accountParent {
+                _id
+                name
+              }
+              name
+              spendingLimit
+            }
+          }
+        }
+      }
+      status
+      type
+      executionDate
+      index
+    }
+  } 
 `;
 
 // Additional queries...
