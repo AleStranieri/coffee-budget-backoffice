@@ -14,12 +14,12 @@ import {  Box,
 import { DeleteIcon } from '@chakra-ui/icons';
 
 
-const TransactionItemDelete = ({ transaction, onDelete }) => {
+const ModalItemDelete = ({ itemId, onDelete }) => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = React.useRef();
   
     const handleDelete = (e) => {
-      onDelete(transaction._id , e);
+      onDelete(itemId , e);
       onClose();
     };
   
@@ -31,11 +31,11 @@ const TransactionItemDelete = ({ transaction, onDelete }) => {
           size="sm"
           leftIcon={<DeleteIcon />}
           onClick={onOpen}>
-          Delete Transaction
+          Delete
         </Button>
 
       <AlertDialog
-        id={transaction._id}
+        id={itemId}
         isOpen={isOpen}
         leastDestructiveRef={cancelRef}
         onClose={onClose}
@@ -43,7 +43,7 @@ const TransactionItemDelete = ({ transaction, onDelete }) => {
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-              Delete Transaction
+              Delete
             </AlertDialogHeader>
 
             <AlertDialogBody>
@@ -55,7 +55,7 @@ const TransactionItemDelete = ({ transaction, onDelete }) => {
                 Cancel
               </Button>
               <Button colorScheme='red' onClick={handleDelete} ml={3}>
-                Delete {transaction._id}
+                Delete 
               </Button>
             </AlertDialogFooter>
           </AlertDialogContent>
@@ -65,6 +65,6 @@ const TransactionItemDelete = ({ transaction, onDelete }) => {
     );
   };
 
-  export default TransactionItemDelete;
+  export default ModalItemDelete;
 
           

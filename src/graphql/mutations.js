@@ -81,3 +81,11 @@ export const UPDATE_PAYMENT_ACCOUNT = gql`
   }
 `;
 
+export const DELETE_PAYMENT_ACCOUNT = gql`
+mutation deletePaymentAccount($paymentAccountId: ID!) {
+  deletePaymentAccount(paymentAccountId: $paymentAccountId) {
+    _id
+  }
+}
+`;
+

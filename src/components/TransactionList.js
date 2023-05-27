@@ -16,7 +16,7 @@ import Pagination from './Pagination';
 import CustomDateField from './CustomDateField';
 import BadgeTransactionStatus from './BadgeTransactionStatus';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import TransactionItemDelete from './TransactionItemDelete';
+import ModalItemDelete from './ModalItemDelete';
 
 const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurring, filterStartDate, filterEndDate }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,7 +64,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
     };
   }
 
-  const { loading, error, data } = useQuery(GET_TRANSACTIONS, {
+  const { loading, error, data, refetch } = useQuery(GET_TRANSACTIONS, {
     variables,
   });
 
@@ -99,6 +99,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
         duration: 3000,
         isClosable: true,
       });
+      refetch();
     })
     .catch((error) => {
       console.error('Transaction deletion error:', error);
@@ -181,7 +182,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
                     size="sm"
                     leftIcon={<EditIcon />}
                     >Edit</Button>
-                    <TransactionItemDelete key={transaction._id} transaction={transaction} onDelete={handleDelete} />
+                    <ModalItemDelete key={transaction._id} itemId={transaction._id} onDelete={handleDelete} />
                 </ButtonGroup>
               </GridItem>
             </Grid>

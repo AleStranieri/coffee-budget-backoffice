@@ -36,7 +36,7 @@ const PaymentAccountFormComponent = () => {
       paymentAccountId: id // assuming you have the id from useParams
     }
   });
-  
+
   useEffect(() => {
 
     if (!debitAccountLoading && debitAccountData && debitAccountData.getPaymentAccounts.docs.length > 0) {
@@ -162,19 +162,19 @@ const PaymentAccountFormComponent = () => {
             <FormControl id="accountParent" mb={4}>
               <FormLabel>Account Parent</FormLabel>
               <Select
-            name="accountParent"
-            label="Account Parent"
-            value={accountParent || ''}
-            onChange={handleChange}
-          >
-            {!debitAccountLoading &&
-              !debitAccountError &&
-              debitAccountData.getPaymentAccounts.docs.map((paymentAccount) => (
-                <option key={paymentAccount._id} value={paymentAccount._id}>
-                  {paymentAccount.name}
-                </option>
-              ))}
-          </Select>
+                  name="accountParent"
+                  label="Account Parent"
+                  value={accountParent || ''}
+                  onChange={handleChange}
+                >
+                  {!debitAccountLoading &&
+                    !debitAccountError &&
+                    debitAccountData.getPaymentAccounts.docs.map((paymentAccount) => (
+                      <option key={paymentAccount._id} value={paymentAccount._id}>
+                        {paymentAccount.name}
+                      </option>
+                    ))}
+                </Select>
             </FormControl>
           </>
         )}

@@ -107,26 +107,6 @@ query GetTransaction($transactionId: ID!) {
         _id
         name
         type
-        ... on DebitAccount {
-          _id
-          amount
-          name
-          type
-        }
-        ... on CreditCardAccount {
-          _id
-          name
-          accountParent {
-            ... on CreditCardAccount {
-              accountParent {
-                _id
-                name
-              }
-              name
-              spendingLimit
-            }
-          }
-        }
       }
       status
       type
