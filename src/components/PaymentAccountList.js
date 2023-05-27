@@ -35,6 +35,10 @@ const PaymentAccountList = () => {
         variables
     });
     const [deletePaymentAccount, { deleteLoading, deleteError }] = useMutation(DELETE_PAYMENT_ACCOUNT);
+
+    useEffect(() => {
+      refetch();
+    }, [refetch]);
   
     if (loading) {
       return <p>Loading...</p>;
