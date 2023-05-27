@@ -43,6 +43,35 @@ export const GET_PAYMENT_ACCOUNTS = gql`
   }
 `;
 
+export const GET_PAYMENT_ACCOUNT = gql`
+  query GetPaymentAccount($paymentAccountId: ID!) {
+    getPaymentAccount(paymentAccountId: $paymentAccountId) {
+      _id
+      name
+      description
+      type
+      ... on DebitAccount {
+        _id
+        amount
+        description
+        name
+      }
+      ... on CreditCardAccount {
+        _id
+        description
+        executionDate
+        name
+        spendingLimit
+        accountParent {
+          ... on DebitAccount {
+            _id
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_TRANSACTIONS = gql`
   query GetTransactions($options: TransactionOptionsInput, $where: TransactionWhereInput) {
     getTransactions(options: $options, where: $where ) {
