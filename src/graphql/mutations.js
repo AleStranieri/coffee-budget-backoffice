@@ -72,3 +72,20 @@ export const CREATE_CREDIT_PAYMENT_ACCOUNT = gql`
   }
 `;
 
+export const UPDATE_PAYMENT_ACCOUNT = gql`
+  mutation updatePaymentAccount($updatePaymentAccountId: ID!, $updatePaymentAccountInput: PaymentAccountInput!) {
+    updatePaymentAccount(id: $updatePaymentAccountId, input: $updatePaymentAccountInput) {
+      _id
+      name
+    }
+  }
+`;
+
+export const DELETE_PAYMENT_ACCOUNT = gql`
+mutation deletePaymentAccount($paymentAccountId: ID!) {
+  deletePaymentAccount(paymentAccountId: $paymentAccountId) {
+    _id
+  }
+}
+`;
+

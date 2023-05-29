@@ -118,7 +118,6 @@ const TransactionFormComponent = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log(id);
 
     if(isEditMode) {
       updateTransaction({
@@ -167,6 +166,8 @@ const TransactionFormComponent = () => {
   const handleChange = (e) => {
     const { name: fieldName, value } = e.target;
     const fieldValue = fieldName === 'amount' ? parseFloat(value) : value;
+    console.log(fieldName);
+    console.log(value);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: fieldValue,
@@ -232,7 +233,7 @@ const TransactionFormComponent = () => {
           <FormLabel>Payment Account</FormLabel>
           <Select
             name="paymentAccount"
-            value={formData.paymentAccount._id || ''}
+            value={formData.paymentAccount}
             onChange={handleChange}
           >
             {!paymentLoading &&

@@ -3,6 +3,7 @@ import {
     Box, 
     Text, 
     Button,
+    useToast,
     ButtonGroup,
     Select,
 } from '@chakra-ui/react';
@@ -10,11 +11,13 @@ import { EditIcon, CheckIcon, DeleteIcon } from '@chakra-ui/icons';
 import { FaCreditCard } from 'react-icons/fa';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_PAYMENT_ACCOUNTS } from '../graphql/queries';
+import { DELETE_PAYMENT_ACCOUNT } from '../graphql/mutations';
 import Pagination from './Pagination';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 const PaymentAccountList = () => {
     const [accountTypeFilter, setAccountTypeFilter] = useState('');
+    const toast = useToast();
 
     const variables = {
         options: {
@@ -28,9 +31,14 @@ const PaymentAccountList = () => {
         };
       }
 
-    const { loading, error, data } = useQuery(GET_PAYMENT_ACCOUNTS, {
+    const { loading, error, data, refetch } = useQuery(GET_PAYMENT_ACCOUNTS, {
         variables
     });
+    const [deletePaymentAccount, { deleteLoading, deleteError }] = useMutation(DELETE_PAYMENT_ACCOUNT);
+
+    useEffect(() => {
+      refetch();
+    }, [refetch]);
   
     if (loading) {
       return <p>Loading...</p>;
@@ -45,12 +53,32 @@ const PaymentAccountList = () => {
     const handleEdit = (id) => {
         // Handle edit action
         console.log(id);
-      };
+    }
+        
     
-    const handleDelete = (id) => {
-        // Handle delete action
-        console.log(id);
+    const handleDelete = (id, e) => {
+      e.preventDefault();
+      console.log(id);
+
+      deletePaymentAccount({
+        variables: {
+          paymentAccountId: id,
+        },
+      }) .then((response) => {
+        console.log('PaymentAccount deleted:', response.data.deletePaymentAccount);
+        toast({
+          title: 'PaymentAccount deleted',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+        refetch();
+      })
+      .catch((error) => {
+        console.error('PaymentAccount deletion error:', error);
+      });
     };
+
 
     const handleFilterChange = (event) => {
         const { value } = event.target;
@@ -99,7 +127,7 @@ const PaymentAccountList = () => {
                   colorScheme="red"
                   size="sm"
                   leftIcon={<DeleteIcon />}
-                  onClick={() => handleDelete(paymentAccount._id)}
+                  onClick={(e) => handleDelete(paymentAccount._id, e)}
                 >
                   Delete
                 </Button>

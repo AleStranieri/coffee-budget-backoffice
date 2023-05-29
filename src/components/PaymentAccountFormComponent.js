@@ -2,8 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Box, FormControl, FormLabel, Input, Button, Select } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useParams, useNavigate } from 'react-router-dom';
-import { CREATE_DEBIT_PAYMENT_ACCOUNT, CREATE_CREDIT_PAYMENT_ACCOUNT } from '../graphql/mutations';
-import { GET_PAYMENT_ACCOUNTS } from '../graphql/queries';
+import { 
+  CREATE_DEBIT_PAYMENT_ACCOUNT, 
+  CREATE_CREDIT_PAYMENT_ACCOUNT,
+  UPDATE_PAYMENT_ACCOUNT } from '../graphql/mutations';
+import { GET_PAYMENT_ACCOUNTS, GET_PAYMENT_ACCOUNT } from '../graphql/queries';
 
 const PaymentAccountFormComponent = () => {
   const [name, setName] = useState('');
@@ -16,30 +19,59 @@ const PaymentAccountFormComponent = () => {
 
   const navigate = useNavigate();
   const { id } = useParams();
+  const isEditMode = !!id; // Check if it is edit mode or add mode
 
   const [createDebitPaymentAccount] = useMutation(CREATE_DEBIT_PAYMENT_ACCOUNT);
   const [createCreditPaymentAccount] = useMutation(CREATE_CREDIT_PAYMENT_ACCOUNT);
+  const [updatePaymentAccount] = useMutation(UPDATE_PAYMENT_ACCOUNT);
 
   const { loading: debitAccountLoading, error: debitAccountError, data: debitAccountData } = useQuery(GET_PAYMENT_ACCOUNTS, {
         where : {
             type: 'DEBIT',
         }
   });
+
+  const { loading: paymentAccountLoading, error: paymentAccountError, data: paymentAccountData } = useQuery(GET_PAYMENT_ACCOUNT, {
+    variables: {
+      paymentAccountId: id // assuming you have the id from useParams
+    }
+  });
+
   useEffect(() => {
+
     if (!debitAccountLoading && debitAccountData && debitAccountData.getPaymentAccounts.docs.length > 0) {
-        setAccountParent(() => ({
-          accountParent: debitAccountData.getPaymentAccounts.docs[0]._id,
-        }));
+      setAccountParent(debitAccountData.getPaymentAccounts.docs[0]._id);
+    }
+
+    if(isEditMode) {
+      if (!paymentAccountLoading && paymentAccountData) {
+        setName(paymentAccountData.getPaymentAccount.name);
+        setPaymentAccountType(paymentAccountData.getPaymentAccount.type);
+        
+        if(paymentAccountData.getPaymentAccount.description) {
+          setDescription(paymentAccountData.getPaymentAccount.description);
+        }
+
+        if(paymentAccountData.getPaymentAccount.type === 'DEBIT') {
+          setAmount(paymentAccountData.getPaymentAccount.amount);
+        } else {
+          setExecutionDate(new Date(paymentAccountData.getPaymentAccount.executionDate/1).toISOString().split('T')[0]);
+          setSpendingLimit(paymentAccountData.getPaymentAccount.spendingLimit);
+          setAccountParent(paymentAccountData.getPaymentAccount.accountParent._id);
+        }
       }
+    }
+
+    
   },[
     debitAccountLoading, 
     debitAccountData,
+    paymentAccountLoading,
+    paymentAccountData
   ]);
 
   const handleChange = (e) => {
-    setAccountParent(() => ({
-      accountParent: e.target.value,
-    }));
+    setAccountParent(e.target.value);
     console.log(accountParent);
   };
 
@@ -47,32 +79,40 @@ const PaymentAccountFormComponent = () => {
     event.preventDefault();
 
     // Prepare the form data
-    const paymentAccountData = {
+    const newPaymentAccountData = {
       name,
       description,
     };
 
     if (paymentAccountType === 'DEBIT') {
-      paymentAccountData.amount = parseFloat(amount);
+      newPaymentAccountData.amount = parseFloat(amount);
     } else if (paymentAccountType === 'CREDIT') {
-      paymentAccountData.spendingLimit = parseFloat(spendingLimit);
-      paymentAccountData.executionDate = executionDate;
-      paymentAccountData.accountParent = accountParent.accountParent;
+      newPaymentAccountData.spendingLimit = parseFloat(spendingLimit);
+      newPaymentAccountData.executionDate = executionDate;
+      newPaymentAccountData.accountParent = accountParent;
     }
+
+    console.log(newPaymentAccountData);
 
     try {
       if (id) {
-        // Update existing payment account
-        // Update mutation for debit and credit accounts separately if needed
+        // Update payment account
+          await updatePaymentAccount({
+            variables: {
+              updatePaymentAccountId: id, 
+              updatePaymentAccountInput: newPaymentAccountData
+            }
+          });
+
       } else {
         // Create new payment account
         if (paymentAccountType === 'DEBIT') {
           await createDebitPaymentAccount({
-            variables: paymentAccountData,
+            variables: newPaymentAccountData,
           });
         } else if (paymentAccountType === 'CREDIT') {
           await createCreditPaymentAccount({
-            variables: paymentAccountData,
+            variables: newPaymentAccountData,
           });
         }
       }
@@ -122,19 +162,19 @@ const PaymentAccountFormComponent = () => {
             <FormControl id="accountParent" mb={4}>
               <FormLabel>Account Parent</FormLabel>
               <Select
-            name="accountParent"
-            label="Account Parent"
-            value={accountParent.accountParent || ''}
-            onChange={handleChange}
-          >
-            {!debitAccountLoading &&
-              !debitAccountError &&
-              debitAccountData.getPaymentAccounts.docs.map((paymentAccount) => (
-                <option key={paymentAccount._id} value={paymentAccount._id}>
-                  {paymentAccount.name}
-                </option>
-              ))}
-          </Select>
+                  name="accountParent"
+                  label="Account Parent"
+                  value={accountParent || ''}
+                  onChange={handleChange}
+                >
+                  {!debitAccountLoading &&
+                    !debitAccountError &&
+                    debitAccountData.getPaymentAccounts.docs.map((paymentAccount) => (
+                      <option key={paymentAccount._id} value={paymentAccount._id}>
+                        {paymentAccount.name}
+                      </option>
+                    ))}
+                </Select>
             </FormControl>
           </>
         )}
