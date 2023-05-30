@@ -8,7 +8,7 @@ import {
   Select,
   useToast,
 } from '@chakra-ui/react';
-import { useMutation, useQuery, gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
   GET_ENUM_TRANSACTIONTYPE,

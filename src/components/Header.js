@@ -7,6 +7,7 @@ const Header = () => {
     { title: 'Home', path: '/' },
     { title: 'Login', path: '/login' },
     { title: 'Transactions', path: '/transactions' },
+    { title: 'Recurring', path: '/recurring-transactions' },
     { title: 'Payment Accounts', path: '/payment-accounts' },
     { title: 'Categories', path: '/categories' },
     // Add more pages as needed

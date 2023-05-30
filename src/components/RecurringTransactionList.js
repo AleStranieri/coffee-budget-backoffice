@@ -9,7 +9,7 @@ import {  Box,
 } from '@chakra-ui/react';
 import { useQuery, useMutation } from '@apollo/client';
 import { EditIcon } from '@chakra-ui/icons';
-import { GET_TRANSACTIONS } from '../graphql/queries';
+import { GET_RECURRING_TRANSACTIONS } from '../graphql/queries';
 import { DELETE_TRANSACTION } from '../graphql/mutations';
 import Pagination from './Pagination';
 import CustomDateField from './CustomDateField';
@@ -17,7 +17,7 @@ import BadgeTransactionStatus from './BadgeTransactionStatus';
 import { Link } from 'react-router-dom';
 import ModalItemDelete from './ModalItemDelete';
 
-const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurring, filterStartDate, filterEndDate }) => {
+const RecurringTransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurring, filterStartDate, filterEndDate }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const toast = useToast();
 
@@ -43,27 +43,27 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
     };
   }
   
-  if (isRecurring !== '') {
-    variables.where = {
-      ...variables.where,
-      'isRecurring': isRecurring === 'true',
-    };
-  }
+//   if (isRecurring !== '') {
+//     variables.where = {
+//       ...variables.where,
+//       'isRecurring': isRecurring === 'true',
+//     };
+//   }
 
-  if (filterStartDate !== '') {
-    variables.where.executionDate = {
-      gte: filterStartDate,
-    };
-  }
+//   if (filterStartDate !== '') {
+//     variables.where.executionDate = {
+//       gte: filterStartDate,
+//     };
+//   }
   
-  if (filterEndDate !== '') {
-    variables.where.executionDate = {
-      ...variables.where.executionDate,
-      lte: filterEndDate,
-    };
-  }
+//   if (filterEndDate !== '') {
+//     variables.where.executionDate = {
+//       ...variables.where.executionDate,
+//       lte: filterEndDate,
+//     };
+//   }
 
-  const { loading, error, data, refetch } = useQuery(GET_TRANSACTIONS, {
+  const { loading, error, data, refetch } = useQuery(GET_RECURRING_TRANSACTIONS, {
     variables,
   });
 
@@ -81,7 +81,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
     return <p>Error: {error.message}</p>;
   }
 
-  const { docs: transactions, totalPages } = data.getTransactions;
+  const { docs: transactions, totalPages } = data.getRecurringTransactions;
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -149,11 +149,11 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
                     sl='2'
                     mr='2'
                   >
-                    <CustomDateField timestamp={transaction.date}/>
+                    <Text>{transaction.start_date}</Text>
                   </Box>
                   <BadgeTransactionStatus status={transaction.status} />
                 </Box>
-                
+                <Box><Text>Frequency: {transaction.frequency_every_n} {transaction.frequency_type}</Text></Box>
               </GridItem>
               <GridItem w='100%'>
                 
@@ -174,6 +174,7 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
                   </Box>
                   
                 <Text>Account: {transaction.paymentAccount.name}</Text>
+                <Box><Text>Occurrences: {transaction.occurrences}</Text></Box>
               </GridItem>
               <GridItem w='100%'>
                 <ButtonGroup ml="auto">
@@ -203,4 +204,4 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
   );
 };
 
-export default TransactionList;
+export default RecurringTransactionList;

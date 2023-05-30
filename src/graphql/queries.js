@@ -116,4 +116,37 @@ query GetTransaction($transactionId: ID!) {
   } 
 `;
 
-// Additional queries...
+export const GET_RECURRING_TRANSACTIONS = gql`
+query GetRecurringTransactions($where: TransactionWhereInput, $options: TransactionOptionsInput) {
+  getRecurringTransactions(where: $where, options: $options) {
+    docs {
+      _id
+      amount
+      name
+      categories {
+        _id
+        name
+      }
+      creator {
+        _id
+        email
+      }
+      createdAt
+      description
+      end_date
+      frequency_every_n
+      frequency_type
+      occurrences
+      paymentAccount {
+        _id
+        name
+      }
+      start_date
+      status
+      type
+      updatedAt
+    }
+  }
+}
+`;
+
