@@ -89,3 +89,51 @@ mutation deletePaymentAccount($paymentAccountId: ID!) {
 }
 `;
 
+
+export const CREATE_RECURRING_TRANSACTION = gql`
+  mutation CreateRecurringTransaction($input: RecurringTransactionInput!) {
+    createRecurringTransaction(input: $input) {
+      _id
+      name
+      description
+      amount
+      status
+      type
+      frequency_every_n
+      frequency_type
+      occurrences
+      start_date
+      end_date
+      paymentAccount {
+        _id
+        name
+      }
+    }
+  }
+`;
+
+export const UPDATE_RECURRING_TRANSACTION = gql`
+  mutation UpdateRecurringTransaction($updateRecurringTransactionId: ID!, $input: RecurringTransactionInput!) {
+    updateRecurringTransaction(recurringTransactionId: $updateRecurringTransactionId, input: $input) {
+      _id
+      name
+      description
+      amount
+      status
+      type
+      frequency_every_n
+      frequency_type
+      occurrences
+      start_date
+      end_date
+      paymentAccount {
+        _id
+        name
+      }
+      categories {
+        _id
+        name
+      }
+    }
+  }
+`;

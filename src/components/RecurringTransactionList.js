@@ -24,7 +24,7 @@ const RecurringTransactionList = ({ page, pageLimit, onPageChange, status, type,
   const variables = {
     options: {
       page: currentPage,
-      limit: pageLimit,
+      limit: 50,
       sort: { date: 'desc' },
     },
   };
@@ -149,7 +149,7 @@ const RecurringTransactionList = ({ page, pageLimit, onPageChange, status, type,
                     sl='2'
                     mr='2'
                   >
-                    <Text>{transaction.start_date}</Text>
+                    <CustomDateField timestamp={transaction.start_date}/>
                   </Box>
                   <BadgeTransactionStatus status={transaction.status} />
                 </Box>
@@ -180,7 +180,7 @@ const RecurringTransactionList = ({ page, pageLimit, onPageChange, status, type,
                 <ButtonGroup ml="auto">
                   <Button
                     as={Link}
-                    to={`/transactions/${transaction._id}/edit`}
+                    to={`/recurring-transactions/${transaction._id}/edit`}
                     colorScheme="teal" 
                     variant="outline"
                     size="sm"

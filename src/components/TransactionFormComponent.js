@@ -166,8 +166,6 @@ const TransactionFormComponent = () => {
   const handleChange = (e) => {
     const { name: fieldName, value } = e.target;
     const fieldValue = fieldName === 'amount' ? parseFloat(value) : value;
-    console.log(fieldName);
-    console.log(value);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: fieldValue,

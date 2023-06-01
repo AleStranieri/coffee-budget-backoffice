@@ -20,6 +20,16 @@ export const GET_ENUM_TRANSACTIONSTATUS = gql`
   }
 `;
 
+export const GET_ENUM_TRANSACTIONFREQTYPE = gql`
+  query GetEnumTransactionFreqType {
+    __type(name: "TransactionRecurringFrequencyType") {
+      enumValues {
+        name
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORIES = gql`
   query GetCategories {
     getCategories {
@@ -148,5 +158,30 @@ query GetRecurringTransactions($where: TransactionWhereInput, $options: Transact
     }
   }
 }
+`;
+
+export const GET_RECURRING_TRANSACTION = gql`
+  query GetRecurringTransaction($recurringTransactionId: ID!) {
+    getRecurringTransaction(recurringTransactionId: $recurringTransactionId) {
+      name
+      description
+      amount
+      status
+      type
+      frequency_every_n
+      frequency_type
+      occurrences
+      start_date
+      end_date
+      paymentAccount {
+        _id
+        name
+      }
+      categories {
+        _id
+        name
+      }
+    }
+  }
 `;
 
