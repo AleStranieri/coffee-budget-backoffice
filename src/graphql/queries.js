@@ -122,6 +122,9 @@ query GetTransaction($transactionId: ID!) {
       type
       executionDate
       index
+      recurringTransaction {
+        _id
+      }
     }
   } 
 `;
@@ -156,6 +159,7 @@ query GetRecurringTransactions($where: TransactionWhereInput, $options: Transact
       type
       updatedAt
     }
+    totalPages
   }
 }
 `;
@@ -180,6 +184,13 @@ export const GET_RECURRING_TRANSACTION = gql`
       categories {
         _id
         name
+      }
+      transactions {
+        docs {
+          _id
+          name
+          status
+        }
       }
     }
   }

@@ -17,7 +17,15 @@ import BadgeTransactionStatus from './BadgeTransactionStatus';
 import { Link } from 'react-router-dom';
 import ModalItemDelete from './ModalItemDelete';
 
-const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurring, filterStartDate, filterEndDate }) => {
+const TransactionList = ({ 
+  pageLimit, 
+  status, 
+  type, 
+  isRecurring, 
+  filterStartDate,
+  filterEndDate, 
+  recurringTransaction 
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const toast = useToast();
 
@@ -43,24 +51,32 @@ const TransactionList = ({ page, pageLimit, onPageChange, status, type, isRecurr
     };
   }
   
-  if (isRecurring !== '') {
+  if (isRecurring !== '' && isRecurring) {
     variables.where = {
       ...variables.where,
       'isRecurring': isRecurring === 'true',
     };
   }
 
-  if (filterStartDate !== '') {
+  if (filterStartDate !== '' && filterStartDate) {
+    console.log(filterStartDate);
     variables.where.executionDate = {
       gte: filterStartDate,
     };
   }
   
-  if (filterEndDate !== '') {
+  if (filterEndDate !== '' && filterEndDate) {
     variables.where.executionDate = {
       ...variables.where.executionDate,
       lte: filterEndDate,
     };
+  }
+
+  if (recurringTransaction !== '') {
+    variables.where = {
+      ...variables.where,
+      recurringTransaction
+    }
   }
 
   const { loading, error, data, refetch } = useQuery(GET_TRANSACTIONS, {

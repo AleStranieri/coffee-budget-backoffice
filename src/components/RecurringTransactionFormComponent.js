@@ -7,6 +7,10 @@ import {
   Button,
   Select,
   useToast,
+  Accordion, 
+  AccordionButton, 
+  AccordionItem, 
+  AccordionPanel
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -21,6 +25,7 @@ import {
   CREATE_RECURRING_TRANSACTION,
   UPDATE_RECURRING_TRANSACTION,
 } from '../graphql/mutations';
+import TransactionList from './TransactionList';
 
 const RecurringTransactionFormComponent = () => {
   const { id } = useParams(); // Get the id parameter from the URL
@@ -40,16 +45,18 @@ const RecurringTransactionFormComponent = () => {
     end_date: '',
     paymentAccount: '',
   });
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
-    const { 
-        loading: getRecurringTransactionLoading, 
-        error: getRecurringTransactionError, 
-        data: getRecurringTransactionData 
-    } = useQuery(GET_RECURRING_TRANSACTION, {
-        variables: {
-            recurringTransactionId: id // assuming you have the id from useParams
-        }
-    });
+  const { 
+      loading: getRecurringTransactionLoading, 
+      error: getRecurringTransactionError, 
+      data: getRecurringTransactionData 
+  } = useQuery(GET_RECURRING_TRANSACTION, {
+      variables: {
+          recurringTransactionId: id // assuming you have the id from useParams
+      },
+      skip: !id,
+  });
 
   const { loading: enumTypeLoading, error: enumTypeError, data: enumTypeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
   const { loading: enumStatusLoading, error: enumStatusError, data: enumStatusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
@@ -239,178 +246,197 @@ const RecurringTransactionFormComponent = () => {
   }
 
   return (
-    <Box maxW="container.sm" mx="auto" py={8}>
-    <form onSubmit={handleSubmit}>
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>Name</FormLabel>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleInputChange}
-            required
-          />
-        </FormControl>
+    <Box>
+      <Box maxW="container.sm" mx="auto" py={8}>
+      <form onSubmit={handleSubmit}>
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>Name</FormLabel>
+            <Input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
+            />
+          </FormControl>
+        </Box>
+
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>Description</FormLabel>
+            <Input
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+        </Box>
+
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>Amount</FormLabel>
+            <Input
+              type="number"
+              name="amount"
+              value={formData.amount}
+              onChange={handleInputChange}
+              required
+            />
+          </FormControl>
+        </Box>
+
+        <Box 
+          display='flex' 
+          alignItems='baseline' 
+          marginBottom={4}>
+
+              <FormControl mr='2'>
+                  <FormLabel>Type</FormLabel>
+                  <Select
+                      name="type"
+                      value={formData.type}
+                      onChange={handleInputChange}
+                      required
+                  >
+                      {!enumTypeLoading &&
+                      !enumTypeError &&
+                      enumTypeData.__type.enumValues.map((enumValues) => (
+                      <option key={enumValues.name} value={enumValues.name}>
+                          {enumValues.name}
+                      </option>
+                      ))}
+                  </Select>
+              </FormControl>
+              <FormControl >
+                  <FormLabel>Status</FormLabel>
+                  <Select
+                      name="status"
+                      value={formData.status}
+                      onChange={handleInputChange}
+                      required
+                  >
+                      {!enumStatusLoading &&
+                      !enumStatusError &&
+                      enumStatusData.__type.enumValues.map((enumValues) => (
+                          <option key={enumValues.name} value={enumValues.name}>
+                              {enumValues.name}
+                          </option>
+                      ))}
+                  </Select>
+              </FormControl>
+        </Box>
+
+        <Box         
+          display='flex' 
+          alignItems='baseline' 
+          marginBottom={4}>
+
+          <FormControl mr='2'>
+            <FormLabel>Frequency Every N</FormLabel>
+            <Input
+              type="number"
+              name="frequency_every_n"
+              value={formData.frequency_every_n}
+              onChange={handleInputChange}
+              required
+            />
+          </FormControl>
+          <FormControl mr='2'>
+            <FormLabel>Frequency Type</FormLabel>
+            <Select
+              name="frequency_type"
+              value={formData.frequency_type}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="DAYLY">Dalyy</option>
+              <option value="WEEKLY">Weekly</option>
+              <option value="MONTHLY">Monthly</option>
+              <option value="YEARLY">Yearly</option>
+            </Select>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Occurrences</FormLabel>
+            <Input
+              type="number"
+              name="occurrences"
+              value={formData.occurrences}
+              onChange={handleInputChange}
+              required
+            />
+          </FormControl>
+        </Box>
+
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>Start Date</FormLabel>
+            <Input
+              type="date"
+              name="start_date"
+              value={formData.start_date}
+              onChange={handleInputChange}
+              required
+            />
+          </FormControl>
+        </Box>
+
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>End Date</FormLabel>
+            <Input
+              type="date"
+              name="end_date"
+              value={formData.end_date}
+              onChange={handleInputChange}
+            />
+          </FormControl>
+        </Box>
+
+        <Box marginBottom={4}>
+          <FormControl>
+            <FormLabel>Payment Account</FormLabel>
+            <Select
+              name="paymentAccount"
+              value={formData.paymentAccount}
+              onChange={handleInputChange}
+              required
+            >
+              {paymentData.getPaymentAccounts.docs.map((account) => (
+                <option key={account._id} value={account._id}>
+                  {account.name}
+                </option>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {/* Additional fields for categories */}
+        {/* ... */}
+        
+        <Button type="submit" isLoading={loading || updateLoading}>
+          {isEditMode ? 'Update Recurring Transaction' : 'Create Recurring Transaction'}
+        </Button>
+      </form>
       </Box>
-
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>Description</FormLabel>
-          <Input
-            type="text"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-          />
-        </FormControl>
-      </Box>
-
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>Amount</FormLabel>
-          <Input
-            type="number"
-            name="amount"
-            value={formData.amount}
-            onChange={handleInputChange}
-            required
-          />
-        </FormControl>
-      </Box>
-
-      <Box 
-        display='flex' 
-        alignItems='baseline' 
-        marginBottom={4}>
-
-            <FormControl mr='2'>
-                <FormLabel>Type</FormLabel>
-                <Select
-                    name="type"
-                    value={formData.type}
-                    onChange={handleInputChange}
-                    required
-                >
-                    {!enumTypeLoading &&
-                    !enumTypeError &&
-                    enumTypeData.__type.enumValues.map((enumValues) => (
-                    <option key={enumValues.name} value={enumValues.name}>
-                        {enumValues.name}
-                    </option>
-                    ))}
-                </Select>
-            </FormControl>
-            <FormControl >
-                <FormLabel>Status</FormLabel>
-                <Select
-                    name="status"
-                    value={formData.status}
-                    onChange={handleInputChange}
-                    required
-                >
-                    {!enumStatusLoading &&
-                    !enumStatusError &&
-                    enumStatusData.__type.enumValues.map((enumValues) => (
-                        <option key={enumValues.name} value={enumValues.name}>
-                            {enumValues.name}
-                        </option>
-                    ))}
-                </Select>
-            </FormControl>
-      </Box>
-
-      <Box         
-        display='flex' 
-        alignItems='baseline' 
-        marginBottom={4}>
-
-        <FormControl mr='2'>
-          <FormLabel>Frequency Every N</FormLabel>
-          <Input
-            type="number"
-            name="frequency_every_n"
-            value={formData.frequency_every_n}
-            onChange={handleInputChange}
-            required
-          />
-        </FormControl>
-        <FormControl mr='2'>
-          <FormLabel>Frequency Type</FormLabel>
-          <Select
-            name="frequency_type"
-            value={formData.frequency_type}
-            onChange={handleInputChange}
-            required
-          >
-            <option value="DAYLY">Dalyy</option>
-            <option value="WEEKLY">Weekly</option>
-            <option value="MONTHLY">Monthly</option>
-            <option value="YEARLY">Yearly</option>
-          </Select>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Occurrences</FormLabel>
-          <Input
-            type="number"
-            name="occurrences"
-            value={formData.occurrences}
-            onChange={handleInputChange}
-            required
-          />
-        </FormControl>
-      </Box>
-
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>Start Date</FormLabel>
-          <Input
-            type="date"
-            name="start_date"
-            value={formData.start_date}
-            onChange={handleInputChange}
-            required
-          />
-        </FormControl>
-      </Box>
-
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>End Date</FormLabel>
-          <Input
-            type="date"
-            name="end_date"
-            value={formData.end_date}
-            onChange={handleInputChange}
-          />
-        </FormControl>
-      </Box>
-
-      <Box marginBottom={4}>
-        <FormControl>
-          <FormLabel>Payment Account</FormLabel>
-          <Select
-            name="paymentAccount"
-            value={formData.paymentAccount}
-            onChange={handleInputChange}
-            required
-          >
-            {paymentData.getPaymentAccounts.docs.map((account) => (
-              <option key={account._id} value={account._id}>
-                {account.name}
-              </option>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-      {/* Additional fields for categories */}
-      {/* ... */}
-      
-      <Button type="submit" isLoading={loading || updateLoading}>
-        {isEditMode ? 'Update Recurring Transaction' : 'Create Recurring Transaction'}
-      </Button>
-    </form>
+      {isEditMode === true && (
+      <Box>
+          <Accordion allowMultiple>
+          <AccordionItem>
+            <h2>
+              <AccordionButton onClick={() => setIsAccordionOpen(!isAccordionOpen)}>
+                {isAccordionOpen ? 'Hide Transactions' : 'Show Transactions'}
+              </AccordionButton>
+            </h2>
+            <AccordionPanel>
+              <TransactionList
+                recurringTransaction={id} 
+              />
+            </AccordionPanel>
+          </AccordionItem>
+        </Accordion>
+      </Box> )}
     </Box>
   );
 };

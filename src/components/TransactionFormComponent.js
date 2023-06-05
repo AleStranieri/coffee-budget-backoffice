@@ -31,12 +31,14 @@ const TransactionFormComponent = () => {
       type: '',
       paymentAccount: '',
       status: '',
+      recurringTransaction: ''
   });
   
   const { loading: getTransactionLoading, error: getTransactionError, data: getTransactionData } = useQuery(GET_TRANSACTION, {
     variables: {
       transactionId: id // assuming you have the id from useParams
-    }
+    },
+    skip: !id,
   });
   const { loading: enumTypeLoading, error: enumTypeError, data: enumTypeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
   const { loading: enumStatusLoading, error: enumStatusError, data: enumStatusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
@@ -78,6 +80,12 @@ const TransactionFormComponent = () => {
         ...prevData,
         paymentAccount: getTransactionData.getTransaction.paymentAccount._id,
       }));
+      if(getTransactionData.getTransaction.recurringTransaction) {
+        setFormData((prevData) => ({
+          ...prevData,
+          recurringTransaction: getTransactionData.getTransaction.recurringTransaction._id,
+        }));
+      }
     }
 
     if(!isEditMode) {

@@ -1,5 +1,6 @@
 import React from 'react';
 import RecurringTransactionFormComponent from '../components/RecurringTransactionFormComponent';
+import { Box, Text } from '@chakra-ui/react';
 
 const RecurringTransactionForm = () => {
   // Handle form submission, data fetching, state management, etc.
@@ -10,10 +11,10 @@ const RecurringTransactionForm = () => {
   };
 
   return (
-    <div>
-      <h1>Transaction Form</h1>
+    <Box maxW="container.lg" mx="auto" py={8}>
+      <Text fontSize="2xl" fontWeight="bold" mb={4}>Transaction Form</Text>
       <RecurringTransactionFormComponent onSubmit={handleSubmit} />
-    </div>
+    </Box>
   );
 };
 

@@ -23,11 +23,11 @@ export const UPDATE_TRANSACTION = gql`
 `;
 
 export const DELETE_TRANSACTION = gql`
-mutation DeleteTransaction($transactionId: ID!) {
-  deleteTransaction(transactionId: $transactionId) {
-    _id
+  mutation DeleteTransaction($transactionId: ID!) {
+    deleteTransaction(transactionId: $transactionId) {
+      _id
+    }
   }
-}
 `;
 
 
@@ -134,6 +134,14 @@ export const UPDATE_RECURRING_TRANSACTION = gql`
         _id
         name
       }
+    }
+  }
+`;
+
+export const DELETE_RECURRING_TRANSACTION = gql`
+  mutation DeleteRecurringTransaction($recurringTransactionId: ID!, $deleteExecutedTransactions: Boolean!) {
+    deleteRecurringTransaction(recurringTransactionId: $recurringTransactionId, deleteExecutedTransactions: $deleteExecutedTransactions) {
+      _id
     }
   }
 `;
