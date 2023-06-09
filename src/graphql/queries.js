@@ -48,6 +48,12 @@ export const GET_PAYMENT_ACCOUNTS = gql`
         _id
         name
         type
+        ... on DebitAccount {
+          amount
+        }
+        ... on CreditCardAccount {
+          spendingLimit
+        }
       }
     }
   }
@@ -190,6 +196,7 @@ export const GET_RECURRING_TRANSACTION = gql`
           _id
           name
           status
+          executionDate
         }
       }
     }

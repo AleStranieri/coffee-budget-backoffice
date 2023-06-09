@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Box,
   FormControl,
@@ -10,7 +10,14 @@ import {
   Accordion, 
   AccordionButton, 
   AccordionItem, 
-  AccordionPanel
+  AccordionPanel,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+  Checkbox,
 } from '@chakra-ui/react';
 import { useMutation, useQuery } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -45,12 +52,17 @@ const RecurringTransactionFormComponent = () => {
     end_date: '',
     paymentAccount: '',
   });
+  const cancelRef = useRef();
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const [showUpdateExecutedTransactionsCheckbox, setShowUpdateExecutedTransactionCheckbox] = useState(false);
+  const [updateExecutedTransactions, setUpdateExecutedTransactions] = useState(false);
 
   const { 
       loading: getRecurringTransactionLoading, 
       error: getRecurringTransactionError, 
-      data: getRecurringTransactionData 
+      data: getRecurringTransactionData,
+      refetch 
   } = useQuery(GET_RECURRING_TRANSACTION, {
       variables: {
           recurringTransactionId: id // assuming you have the id from useParams
@@ -158,6 +170,7 @@ const RecurringTransactionFormComponent = () => {
             }));
           }
     }
+    refetch();
   }, [isEditMode, 
         getRecurringTransactionLoading, 
         getRecurringTransactionData,
@@ -166,7 +179,8 @@ const RecurringTransactionFormComponent = () => {
         paymentLoading, 
         paymentData, 
         enumStatusLoading, 
-        enumStatusData
+        enumStatusData,
+        refetch
     ]);
 
   const handleInputChange = (event) => {
@@ -192,20 +206,25 @@ const RecurringTransactionFormComponent = () => {
 
     try {
       if (isEditMode) {
-        // Perform update mutation
-        await updateRecurringTransaction({
-          variables: {
-            updateRecurringTransactionId: id,
-            input: formData,
-          },
-        });
-
-        toast({
-          title: 'Recurring Transaction updated.',
-          status: 'success',
-          duration: 3000,
-          isClosable: true,
-        });
+        const oldStartDate = getRecurringTransactionData.getRecurringTransaction.start_date;
+        const newStartDate = new Date(formData.start_date).getTime();
+        
+        if (newStartDate > oldStartDate) {
+          console.log(newStartDate);
+          // Check if there are executed transactions with an execution date less than the new start date
+          const executedTransactions = getRecurringTransactionData.getRecurringTransaction.transactions.docs.filter(
+            (transaction) => transaction.status === 'EXECUTED'
+          );
+          console.log(executedTransactions);
+          if (executedTransactions.length > 0) {
+            // Show the AlertDialog
+            setShowUpdateExecutedTransactionCheckbox(true);
+          } else {
+            setShowUpdateExecutedTransactionCheckbox(false);
+          }
+        }
+        setIsAlertDialogOpen(true);
+        return
       } else {
         // Perform create mutation
         await createRecurringTransaction({
@@ -220,6 +239,7 @@ const RecurringTransactionFormComponent = () => {
           duration: 3000,
           isClosable: true,
         });
+        refetch();
       }
 
       navigate('/recurring-transactions'); // Redirect to recurring transactions list
@@ -233,6 +253,33 @@ const RecurringTransactionFormComponent = () => {
         isClosable: true,
       });
     }
+  };
+  
+  const handleAlertDialogCancel = () => {
+    // Close the AlertDialog
+    setIsAlertDialogOpen(false);
+  };
+  
+  const handleAlertDialogConfirm = async () => {
+    // Perform update mutation
+    await updateRecurringTransaction({
+      variables: {
+        id: id,
+        input: formData,
+        updateExecutedTransactions: updateExecutedTransactions,
+      },
+    });
+  
+    toast({
+      title: 'Recurring Transaction updated.',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+    refetch();
+  
+    // Close the AlertDialog
+    setIsAlertDialogOpen(false);
   };
 
   if ((getRecurringTransactionLoading && isEditMode) || enumTypeLoading || enumStatusLoading || paymentLoading || enumFreqTypeLoading) {
@@ -437,6 +484,45 @@ const RecurringTransactionFormComponent = () => {
           </AccordionItem>
         </Accordion>
       </Box> )}
+        <AlertDialog
+    isOpen={isAlertDialogOpen}
+    leastDestructiveRef={cancelRef}
+    onClose={handleAlertDialogCancel}
+  >
+    <AlertDialogOverlay>
+      <AlertDialogContent>
+        <AlertDialogHeader fontSize="lg" fontWeight="bold">
+          Update Recurring Transaction
+        </AlertDialogHeader>
+
+        <AlertDialogBody>
+        Are you sure you want to update the recurring transaction
+        {showUpdateExecutedTransactionsCheckbox
+          ? ", including all related transactions?"
+          : ", also all related transactions will be updated?"}
+        {showUpdateExecutedTransactionsCheckbox && (
+          <Checkbox
+          isChecked={updateExecutedTransactions}
+          onChange={(e) => setUpdateExecutedTransactions(e.target.checked)}
+          colorScheme="blue"
+          mt={4}
+        >
+            I want to update also Executed Transaction
+          </Checkbox>
+        )}
+      </AlertDialogBody>
+  
+        <AlertDialogFooter>
+          <Button ref={cancelRef} onClick={handleAlertDialogCancel}>
+            Cancel
+          </Button>
+          <Button colorScheme="red" onClick={handleAlertDialogConfirm} ml={3}>
+            Update
+          </Button>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialogOverlay>
+  </AlertDialog>
     </Box>
   );
 };

@@ -109,7 +109,16 @@ const PaymentAccountList = () => {
               ) : (
                 <FaCreditCard size={16} color="teal" style={{ marginRight: '8px' }} />
               )}
-              <Text>{paymentAccount.name}</Text>
+              <Text style={{ marginRight: '8px' }}>{paymentAccount.name}</Text>
+              {paymentAccount.amount ? (
+                 <Text
+                 fontWeight='semibold'
+                  letterSpacing='wide'>[{paymentAccount.amount}]</Text>
+              ) : (
+                <Text
+                  fontWeight='semibold'
+                  letterSpacing='wide'>[{paymentAccount.spendingLimit}]</Text>
+              )}
               <ButtonGroup ml="auto">
                 <Button
                     as={Link}

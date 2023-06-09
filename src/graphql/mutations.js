@@ -113,8 +113,8 @@ export const CREATE_RECURRING_TRANSACTION = gql`
 `;
 
 export const UPDATE_RECURRING_TRANSACTION = gql`
-  mutation UpdateRecurringTransaction($updateRecurringTransactionId: ID!, $input: RecurringTransactionInput!) {
-    updateRecurringTransaction(recurringTransactionId: $updateRecurringTransactionId, input: $input) {
+  mutation UpdateRecurringTransaction($id: ID!, $input: RecurringTransactionInput!, $updateExecutedTransactions: Boolean!) {
+    updateRecurringTransaction(id: $id, input: $input, updateExecutedTransactions: $updateExecutedTransactions) {
       _id
       name
       description
