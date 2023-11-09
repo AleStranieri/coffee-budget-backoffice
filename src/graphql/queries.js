@@ -112,7 +112,7 @@ query GetTransaction($transactionId: ID!) {
     getTransaction(transactionId: $transactionId) {
       _id
       amount
-      categories {
+      category {
         _id
         name
       }
@@ -142,8 +142,9 @@ query GetRecurringTransactions($where: TransactionWhereInput, $options: Transact
       _id
       amount
       name
-      categories {
+      category {
         _id
+        color
         name
       }
       creator {
@@ -187,7 +188,7 @@ export const GET_RECURRING_TRANSACTION = gql`
         _id
         name
       }
-      categories {
+      category {
         _id
         name
       }
