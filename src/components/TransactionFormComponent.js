@@ -31,7 +31,7 @@ const TransactionFormComponent = () => {
       type: '',
       paymentAccount: '',
       status: '',
-      recurringTransaction: ''
+      //recurringTransaction: ''
   });
   
   const { loading: getTransactionLoading, error: getTransactionError, data: getTransactionData } = useQuery(GET_TRANSACTION, {
@@ -80,12 +80,12 @@ const TransactionFormComponent = () => {
         ...prevData,
         paymentAccount: getTransactionData.getTransaction.paymentAccount._id,
       }));
-      if(getTransactionData.getTransaction.recurringTransaction) {
-        setFormData((prevData) => ({
-          ...prevData,
-          recurringTransaction: getTransactionData.getTransaction.recurringTransaction._id,
-        }));
-      }
+      // if(getTransactionData.getTransaction.recurringTransaction) {
+      //   setFormData((prevData) => ({
+      //     ...prevData,
+      //     recurringTransaction: getTransactionData.getTransaction.recurringTransaction._id,
+      //   }));
+      // }
     }
 
     if(!isEditMode) {
@@ -148,12 +148,11 @@ const TransactionFormComponent = () => {
         console.error('Transaction creation error:', error);
       });
     } else {
-
       createTransaction({
         variables: {
           input: formData,
         },
-      }) .then((response) => {
+      }).then((response) => {
         console.log('Transaction created:', response.data.createTransaction);
         toast({
           title: 'Transaction saved',
@@ -174,6 +173,7 @@ const TransactionFormComponent = () => {
   const handleChange = (e) => {
     const { name: fieldName, value } = e.target;
     const fieldValue = fieldName === 'amount' ? parseFloat(value) : value;
+    console.log(fieldValue);
     setFormData((prevData) => ({
       ...prevData,
       [fieldName]: fieldValue,
