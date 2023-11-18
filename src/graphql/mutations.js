@@ -145,3 +145,45 @@ export const DELETE_RECURRING_TRANSACTION = gql`
     }
   }
 `;
+
+export const DELETE_CATEGORY = gql`
+  mutation DeleteCategory($categoryId: ID!) {
+    deleteCategory(categoryId: $categoryId) {
+      _id
+    }
+  }
+`;
+
+export const CREATE_CATEGORY = gql`
+  mutation CreateCategory($input: CategoryInput!) {
+    createCategory(input: $input) {
+      _id
+      name
+      description
+      categoryParent {
+        _id
+        name
+        description
+        color
+      }
+      color
+    }
+  }
+`;
+
+export const UPDATE_CATEGORY = gql`
+  mutation UpdateCategory($id: ID!, $input: CategoryInput!) {
+    updateCategory(id: $id, input: $input) {
+      _id
+      name
+      description
+      categoryParent {
+        _id
+        name
+        description
+        color
+      }
+      color
+    }
+  }
+`;

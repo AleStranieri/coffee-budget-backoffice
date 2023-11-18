@@ -10,6 +10,8 @@ import PaymentAccounts from './pages/PaymentAccounts';
 import PaymentAccountForm from './pages/PaymentAccountForm';
 import RecurringTransactions from './pages/RecurringTransactions';
 import RecurringTransactionForm from './pages/RecurringTransactionForm';
+import Categories from './pages/Categories';
+import CategoryForm from './pages/CategoryForm';
 
 const App = () => {
   return (
@@ -27,6 +29,9 @@ const App = () => {
         <Route exact path="/payment-accounts/" element={<PaymentAccounts />} />
         <Route exact path="/payment-accounts/create" element={<PaymentAccountForm />} />
         <Route exact path="/payment-accounts/:id/edit" element={<PaymentAccountForm />} />
+        <Route exact path="/categories/" element={<Categories />} />
+        <Route exact path="/categories/create" element={<CategoryForm />} />
+        <Route exact path="/categories/:id/edit" element={<CategoryForm />} />
       </Routes>
       <Footer />
     </Router>

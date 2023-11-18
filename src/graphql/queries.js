@@ -30,12 +30,43 @@ export const GET_ENUM_TRANSACTIONFREQTYPE = gql`
   }
 `;
 
-export const GET_CATEGORIES = gql`
-  query GetCategories {
-    getCategories {
+export const GET_CATEGORIES_PAGINATED = gql`
+  query GetCategories($options: CategoryOptionsInput) {
+    getCategories(options: $options) {
       docs {
         _id
         name
+        description
+        categoryParent {
+          _id
+          name
+          description
+        }
+        color
+      }
+      hasNextPage
+      hasPrevPage
+      nextPage
+      prevPage
+      totalPages
+    }
+  }
+`;
+
+export const GET_CATEGORIES = gql`
+  query GetCategories($where: CategoryWhereInput) {
+    getCategories(where: $where) {
+      _id
+      color
+      createdAt
+      description
+      name
+      updatedAt
+      categoryParent {
+        _id
+        color
+        name
+        description
       }
     }
   }
