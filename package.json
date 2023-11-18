@@ -5,7 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.14",
     "@chakra-ui/icons": "^2.0.19",
-    "@chakra-ui/react": "^2.6.1",
+    "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
     "@testing-library/jest-dom": "^5.16.5",

@@ -15,7 +15,7 @@ const Dashboard = () => {
         <Button as={Link} to="/transactions/create" colorScheme="teal" leftIcon={<AddIcon />} mr={4}>
           New Transaction
         </Button>
-        <Button colorScheme="teal" leftIcon={<AddIcon />}>
+        <Button as={Link} to="/payment-accounts/create" colorScheme="teal" leftIcon={<AddIcon />}>
           New Payment Account
         </Button>
       </Flex>
