@@ -30,44 +30,29 @@ export const GET_ENUM_TRANSACTIONFREQTYPE = gql`
   }
 `;
 
-export const GET_CATEGORIES_PAGINATED = gql`
-  query GetCategories($options: CategoryOptionsInput) {
-    getCategories(options: $options) {
+export const GET_CATEGORIES = gql`
+  query GetCategories($where: CategoryWhereInput, $options: CategoryOptionsInput) {
+    getCategories(where: $where, options: $options) {
       docs {
         _id
-        name
+        color
+        createdAt
         description
+        name
+        updatedAt
         categoryParent {
           _id
+          color
           name
           description
         }
-        color
+        
       }
       hasNextPage
       hasPrevPage
       nextPage
       prevPage
       totalPages
-    }
-  }
-`;
-
-export const GET_CATEGORIES = gql`
-  query GetCategories($where: CategoryWhereInput) {
-    getCategories(where: $where) {
-      _id
-      color
-      createdAt
-      description
-      name
-      updatedAt
-      categoryParent {
-        _id
-        color
-        name
-        description
-      }
     }
   }
 `;
@@ -119,6 +104,12 @@ export const GET_PAYMENT_ACCOUNT = gql`
   }
 `;
 
+export const GET_TOTAL_BUDGET = gql`
+  query GetTotalBudget($where: PaymentAccountWhereInput) {
+    getTotalBudget(where: $where)
+  }
+`;
+
 export const GET_TRANSACTIONS = gql`
   query GetTransactions($options: TransactionOptionsInput, $where: TransactionWhereInput) {
     getTransactions(options: $options, where: $where ) {
@@ -164,6 +155,37 @@ query GetTransaction($transactionId: ID!) {
       }
     }
   } 
+`;
+
+export const GET_TRANSACTIONS_AMOUNT = gql`
+query GetTransactionsAmount(
+  $startDate: String!, 
+  $endDate: String!, 
+  $transactionType: TransactionType!, 
+  $transactionStatus: TransactionStatus!
+) {
+  getTransactionsAmount(
+    startDate: $startDate, 
+    endDate: $endDate, 
+    transactionType: $transactionType, 
+    transactionStatus: $transactionStatus
+  ) 
+}
+`;
+
+export const GET_FORECAST = gql`
+query GetForecastTransactions(
+  $startDate: String!, 
+  $endDate: String!, 
+  ) {
+  getForecastTransactions(
+    startDate: $startDate, 
+    endDate: $endDate, 
+  ) {
+    day
+    amount
+  }
+}
 `;
 
 export const GET_RECURRING_TRANSACTIONS = gql`

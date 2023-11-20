@@ -93,7 +93,7 @@ const CategoryFormComponent = () => {
           >
             {!categoryLoading &&
               !categoryError &&
-              categoryData.getCategories.map((category) => (
+              categoryData.getCategories.docs.map((category) => (
                 <option key={category._id} value={category._id}>
                   {category.name}
                 </option>

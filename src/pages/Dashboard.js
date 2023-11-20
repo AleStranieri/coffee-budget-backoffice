@@ -1,9 +1,61 @@
 import React from 'react';
-import { Box, Button, Flex, Heading, SimpleGrid, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, SimpleGrid, Text, Stat, StatLabel, StatNumber } from '@chakra-ui/react';
 import { AddIcon } from '@chakra-ui/icons';
 import { Link } from 'react-router-dom';
+import { useQuery } from '@apollo/client';
+import LineChart from '../components/LineChart';
+import { GET_TOTAL_BUDGET, GET_TRANSACTIONS_AMOUNT, GET_FORECAST } from '../graphql/queries';
+
+
+const today = new Date();
+const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
 const Dashboard = () => {
+  const { loading: loading, error: error, data: data } = useQuery(GET_TOTAL_BUDGET, {
+    variables: {
+      where: {
+        type: "DEBIT"
+      },
+    }
+  });
+  const { 
+    loading: loadingTransactionsSpent, 
+    error: errorTransactionsSpent, 
+    data: dataTransactionsSpent 
+  } = useQuery(GET_TRANSACTIONS_AMOUNT, {
+    variables: {
+        "startDate": firstDayOfMonth,
+        "endDate": today,
+        "transactionType":"SPENT",
+        "transactionStatus": "EXECUTED",
+    }
+  });
+  const { 
+    loading: loadingTransactionsRevenue, 
+    error: errorTransactionsRevenue, 
+    data: dataTransactionsRevenue 
+  } = useQuery(GET_TRANSACTIONS_AMOUNT, {
+    variables: {
+        "startDate": firstDayOfMonth,
+        "endDate": today,
+        "transactionType":"REVENUE",
+        "transactionStatus": "EXECUTED",
+    }
+  });
+  const { 
+    loading: loadingForecast, 
+    error: errorForecast, 
+    data: dataForecast 
+  } = useQuery(GET_FORECAST, {
+    variables: {
+      "startDate": firstDayOfMonth,
+      "endDate": new Date(today.getFullYear() + 5, today.getMonth(), today.getDate()),
+  }
+  })
+
+  if (loading || loadingTransactionsSpent || loadingTransactionsRevenue || loadingForecast) return <p>Loading...</p>;
+  if (error || errorTransactionsSpent || errorTransactionsRevenue || errorForecast) return <p>Error: {error.message}</p>;
+
   return (
     <Box p={8}>
       <Heading as="h2" size="lg" mb={4}>
@@ -23,25 +75,22 @@ const Dashboard = () => {
 
       <SimpleGrid columns={[1, 2, 3]} spacing={6} mt={8}>
         <Box bg="gray.100" p={4} borderRadius="md">
-          <Heading size="md" mb={2}>
-            Monthly Revenue
-          </Heading>
-          {/* Add revenue data or component */}
-          {/* Example: <Text>$5000</Text> */}
+          <Stat>
+            <StatLabel> Monthly Revenue</StatLabel>
+            <StatNumber>{dataTransactionsRevenue.getTransactionsAmount}</StatNumber>
+          </Stat>
         </Box>
         <Box bg="gray.100" p={4} borderRadius="md">
-          <Heading size="md" mb={2}>
-            Monthly Spent
-          </Heading>
-          {/* Add spent data or component */}
-          {/* Example: <Text>$3000</Text> */}
+          <Stat>
+            <StatLabel>Monthly Spent</StatLabel>
+            <StatNumber>{dataTransactionsSpent.getTransactionsAmount}</StatNumber>
+          </Stat>
         </Box>
         <Box bg="gray.100" p={4} borderRadius="md">
-          <Heading size="md" mb={2}>
-            Total Budget
-          </Heading>
-          {/* Add total budget data or component */}
-          {/* Example: <Text>$10000</Text> */}
+          <Stat>
+            <StatLabel>Total budget</StatLabel>
+            <StatNumber>{data.getTotalBudget}</StatNumber>
+          </Stat>
         </Box>
       </SimpleGrid>
 
@@ -49,8 +98,13 @@ const Dashboard = () => {
         <Heading size="md" mb={4}>
           Budget Forecast
         </Heading>
-        {/* Add budget forecast chart component */}
-        {/* Example: <BudgetForecastChart /> */}
+        {/* <LineChart data={dataForecast} /> */}
+        {dataForecast.getForecastTransactions[0] ? (
+        <LineChart data={dataForecast} />
+        ) : (
+          <Text>No forecast data available.</Text>
+        )}
+
       </Box>
 
     </Box>

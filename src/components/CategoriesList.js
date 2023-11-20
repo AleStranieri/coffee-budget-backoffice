@@ -34,7 +34,7 @@ const CategoriesList = () => {
 
   return (
     <Box>
-      {data.getCategories.map((category) => (
+      {data.getCategories.docs.map((category) => (
         <Box key={category._id} p={5} shadow="md" borderWidth="1px">
           <HStack spacing="24px">
             <VStack align="start">
