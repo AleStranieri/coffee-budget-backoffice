@@ -15,6 +15,7 @@ import {
   GET_ENUM_TRANSACTIONSTATUS,
   GET_PAYMENT_ACCOUNTS,
   GET_TRANSACTION,
+  GET_CATEGORIES
 } from '../graphql/queries';
 import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from '../graphql/mutations';
 
@@ -31,10 +32,16 @@ const TransactionFormComponent = () => {
       type: '',
       paymentAccount: '',
       status: '',
+      category: '',
       //recurringTransaction: ''
   });
   
-  const { loading: getTransactionLoading, error: getTransactionError, data: getTransactionData } = useQuery(GET_TRANSACTION, {
+  const { 
+    loading: getTransactionLoading, 
+    error: getTransactionError, 
+    data: getTransactionData,
+    refetch 
+  } = useQuery(GET_TRANSACTION, {
     variables: {
       transactionId: id // assuming you have the id from useParams
     },
@@ -43,6 +50,7 @@ const TransactionFormComponent = () => {
   const { loading: enumTypeLoading, error: enumTypeError, data: enumTypeData } = useQuery(GET_ENUM_TRANSACTIONTYPE);
   const { loading: enumStatusLoading, error: enumStatusError, data: enumStatusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
   const { loading: paymentLoading, error: paymentError, data: paymentData } = useQuery(GET_PAYMENT_ACCOUNTS);
+  const { loading: categoryLoading, error: categoryError, data: categoryData } = useQuery(GET_CATEGORIES);
 
   const [createTransaction, { loading, error }] = useMutation(CREATE_TRANSACTION);
   const [updateTransaction, { updateLoading, updateError }] = useMutation(UPDATE_TRANSACTION);
@@ -80,6 +88,10 @@ const TransactionFormComponent = () => {
         ...prevData,
         paymentAccount: getTransactionData.getTransaction.paymentAccount._id,
       }));
+      setFormData((prevData) => ({
+        ...prevData,
+        category: getTransactionData.getTransaction.category._id,
+      }));
       // if(getTransactionData.getTransaction.recurringTransaction) {
       //   setFormData((prevData) => ({
       //     ...prevData,
@@ -111,6 +123,7 @@ const TransactionFormComponent = () => {
         }));
       }
     }
+    refetch();
   }, [
         isEditMode, 
         getTransactionLoading,
@@ -120,7 +133,10 @@ const TransactionFormComponent = () => {
         paymentLoading, 
         paymentData, 
         enumStatusLoading, 
-        enumStatusData
+        enumStatusData,
+        categoryData,
+        categoryLoading,
+        refetch
       ]
     );
 
@@ -263,6 +279,23 @@ const TransactionFormComponent = () => {
               enumStatusData.__type.enumValues.map((enumValue) => (
                 <option key={enumValue.name} value={enumValue.name}>
                   {enumValue.name}
+                </option>
+              ))}
+          </Select>
+        </FormControl>
+        <FormControl mt={4}>
+          <FormLabel>Category</FormLabel>
+          <Select
+            placeholder="Select category (optional)"
+            name="category"
+            value={formData.category || ''}
+            onChange={handleChange}
+          >
+            {!categoryLoading &&
+              !categoryError &&
+              categoryData.getCategories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
                 </option>
               ))}
           </Select>

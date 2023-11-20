@@ -27,6 +27,7 @@ import {
   GET_PAYMENT_ACCOUNTS,
   GET_RECURRING_TRANSACTION,
   GET_ENUM_TRANSACTIONFREQTYPE,
+  GET_CATEGORIES,
 } from '../graphql/queries';
 import {
   CREATE_RECURRING_TRANSACTION,
@@ -51,6 +52,7 @@ const RecurringTransactionFormComponent = () => {
     start_date: new Date().toISOString().split('T')[0],
     end_date: '',
     paymentAccount: '',
+    category:'',
   });
   const cancelRef = useRef();
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
@@ -74,6 +76,7 @@ const RecurringTransactionFormComponent = () => {
   const { loading: enumStatusLoading, error: enumStatusError, data: enumStatusData } = useQuery(GET_ENUM_TRANSACTIONSTATUS);
   const { loading: enumFreqTypeLoading, error: enumFreqTypeError, data: enumFreqTypeData } = useQuery(GET_ENUM_TRANSACTIONFREQTYPE);
   const { loading: paymentLoading, error: paymentError, data: paymentData } = useQuery(GET_PAYMENT_ACCOUNTS);
+  const { loading: categoryLoading, error: categoryError, data: categoryData } = useQuery(GET_CATEGORIES);
 
   const [createRecurringTransaction, { loading, error }] = useMutation(CREATE_RECURRING_TRANSACTION);
   const [updateRecurringTransaction, { updateLoading, updateError }] = useMutation(UPDATE_RECURRING_TRANSACTION);
@@ -133,6 +136,10 @@ const RecurringTransactionFormComponent = () => {
             ...prevData,
             paymentAccount: getRecurringTransactionData.getRecurringTransaction.paymentAccount._id,
         }));
+        setFormData((prevData) => ({
+          ...prevData,
+          category: getRecurringTransactionData.getRecurringTransaction.category._id,
+        }));
 
         // if(getRecurringTransactionData.getRecurringTransaction.categories) {
         //     setFormData((prevData) => ({
@@ -180,6 +187,8 @@ const RecurringTransactionFormComponent = () => {
         paymentData, 
         enumStatusLoading, 
         enumStatusData,
+        categoryData,
+        categoryLoading,
         refetch
     ]);
 
@@ -457,8 +466,25 @@ const RecurringTransactionFormComponent = () => {
               ))}
             </Select>
           </FormControl>
+          <FormControl mt={4}>
+          <FormLabel>Category</FormLabel>
+          <Select
+            placeholder="Select category (optional)"
+            name="category"
+            value={formData.category || ''}
+            onChange={handleInputChange}
+          >
+            {!categoryLoading &&
+              !categoryError &&
+              categoryData.getCategories.map((category) => (
+                <option key={category._id} value={category._id}>
+                  {category.name}
+                </option>
+              ))}
+          </Select>
+        </FormControl>
         </Box>
-
+        
         {/* Additional fields for categories */}
         {/* ... */}
         
