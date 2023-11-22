@@ -104,6 +104,10 @@ export const CREATE_RECURRING_TRANSACTION = gql`
       occurrences
       start_date
       end_date
+      category {
+        _id
+        name
+      }
       paymentAccount {
         _id
         name
@@ -130,7 +134,7 @@ export const UPDATE_RECURRING_TRANSACTION = gql`
         _id
         name
       }
-      categories {
+      category {
         _id
         name
       }

@@ -48,12 +48,13 @@ const RecurringTransactionFormComponent = () => {
     type: '',
     frequency_every_n: 1,
     frequency_type: '',
-    occurrences: '',
+    occurrences: null,
     start_date: new Date().toISOString().split('T')[0],
     end_date: '',
     paymentAccount: '',
     category:'',
   });
+  console.log(formData);
   const cancelRef = useRef();
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
@@ -109,7 +110,7 @@ const RecurringTransactionFormComponent = () => {
         if(getRecurringTransactionData.getRecurringTransaction.frequency_every_n) {
             setFormData((prevData) => ({
                 ...prevData,
-                frequency_every_n: getRecurringTransactionData.getRecurringTransaction.frequency_every_n,
+                frequency_every_n: parseInt(getRecurringTransactionData.getRecurringTransaction.frequency_every_n),
             }));
         }
         setFormData((prevData) => ({
@@ -127,6 +128,7 @@ const RecurringTransactionFormComponent = () => {
             start_date: new Date(getRecurringTransactionData.getRecurringTransaction.start_date/1).toISOString().split('T')[0],
         }));
         if(getRecurringTransactionData.getRecurringTransaction.end_date) {
+            console.log(getRecurringTransactionData.getRecurringTransaction.end_date);
             setFormData((prevData) => ({
                 ...prevData,
                 end_date: new Date(getRecurringTransactionData.getRecurringTransaction.end_date/1).toISOString().split('T')[0],
@@ -141,12 +143,6 @@ const RecurringTransactionFormComponent = () => {
           category: getRecurringTransactionData.getRecurringTransaction.category._id,
         }));
 
-        // if(getRecurringTransactionData.getRecurringTransaction.categories) {
-        //     setFormData((prevData) => ({
-        //         ...prevData,
-        //         categories: getRecurringTransactionData.getRecurringTransaction.categories,
-        //     }));
-        // }
     } else {
 
         if (!enumTypeLoading && enumTypeData) {
@@ -200,9 +196,17 @@ const RecurringTransactionFormComponent = () => {
         fieldValue = parseFloat(value);
     } 
     
-    if (fieldName === 'occurrences') {
-        fieldValue = parseInt(value);
+    if (fieldName === 'occurrences' && value !== '') {
+      fieldValue = parseInt(value);
+    } else if(fieldName === 'occurrences' && value === '') {
+      fieldValue = null
     }
+
+    if (fieldName === 'frequency_every_n') {
+      fieldValue = parseInt(value);
+    } 
+
+    console.log(fieldName, fieldValue);
 
     setFormData((prevData) => ({
       ...prevData,
@@ -219,12 +223,12 @@ const RecurringTransactionFormComponent = () => {
         const newStartDate = new Date(formData.start_date).getTime();
         
         if (newStartDate > oldStartDate) {
-          console.log(newStartDate);
+
           // Check if there are executed transactions with an execution date less than the new start date
           const executedTransactions = getRecurringTransactionData.getRecurringTransaction.transactions.docs.filter(
             (transaction) => transaction.status === 'EXECUTED'
           );
-          console.log(executedTransactions);
+
           if (executedTransactions.length > 0) {
             // Show the AlertDialog
             setShowUpdateExecutedTransactionCheckbox(true);
@@ -407,7 +411,7 @@ const RecurringTransactionFormComponent = () => {
               onChange={handleInputChange}
               required
             >
-              <option value="DAYLY">Dalyy</option>
+              <option value="DAILY">Daily</option>
               <option value="WEEKLY">Weekly</option>
               <option value="MONTHLY">Monthly</option>
               <option value="YEARLY">Yearly</option>
@@ -420,7 +424,6 @@ const RecurringTransactionFormComponent = () => {
               name="occurrences"
               value={formData.occurrences}
               onChange={handleInputChange}
-              required
             />
           </FormControl>
         </Box>

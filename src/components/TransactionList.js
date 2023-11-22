@@ -35,6 +35,7 @@ const TransactionList = ({
       limit: pageLimit,
       sort: { date: 'desc' },
     },
+    where: {},
   };
 
   if (status !== '') {

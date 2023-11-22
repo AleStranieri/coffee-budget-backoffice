@@ -34,7 +34,7 @@ const CategoryFormComponent = () => {
   }, [isEditMode, categoryLoading, categoryData, id]);
   
   const handleCategoryChange = (value) => {
-    setCategoryParent(value === '' ? null : value);
+    setCategoryParent(value || null);
   };
 
   const handleSubmit = async (event) => {
