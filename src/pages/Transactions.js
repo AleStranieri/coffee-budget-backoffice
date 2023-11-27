@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Text, Select, Stack, Input, Button, InputGroup, InputLeftAddon } from '@chakra-ui/react';
 import TransactionList from '../components/TransactionList';
 import { useQuery } from '@apollo/client';
@@ -17,6 +17,13 @@ const Transactions = () => {
 
   const transactionStatusValues = statusData?.__type?.enumValues || [];
   const transactionTypeValues = typeData?.__type?.enumValues || [];
+
+    // Set default end date to today + 4 days
+  useEffect(() => {
+    const today = new Date();
+    const defaultEndDate = new Date(today.setDate(today.getDate() + 4)).toISOString().split('T')[0];
+    setFilterEndDate(defaultEndDate);
+  }, []);
   
 
   const handleFilterSubmit = () => {

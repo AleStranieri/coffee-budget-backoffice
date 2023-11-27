@@ -89,7 +89,7 @@ const Dashboard = () => {
         <Box bg="gray.100" p={4} borderRadius="md">
           <Stat>
             <StatLabel>Total budget</StatLabel>
-            <StatNumber>{data.getTotalBudget}</StatNumber>
+            <StatNumber>{parseFloat(data.getTotalBudget).toFixed(2)}</StatNumber>
           </Stat>
         </Box>
       </SimpleGrid>

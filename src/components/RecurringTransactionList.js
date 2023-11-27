@@ -44,9 +44,9 @@ const RecurringTransactionList = ({
 
   const variables = {
     options: {
-      page: currentPage,
-      limit: pageLimit,
-      sort: { date: 'desc' },
+      // page: currentPage,
+      // limit: pageLimit,
+      sort: { name: 'desc' },
     },
   };
 

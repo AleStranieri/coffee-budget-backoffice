@@ -60,7 +60,6 @@ const TransactionList = ({
   }
 
   if (filterStartDate !== '' && filterStartDate) {
-    console.log(filterStartDate);
     variables.where.executionDate = {
       gte: filterStartDate,
     };
