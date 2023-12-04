@@ -1,6 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Flex, Text } from '@chakra-ui/react';
+import LoginButton from './LoginButton';
+import Profile from './Profile';
+import LogoutButton from './LogoutButton';
 
 const Header = () => {
     const pages = [
@@ -23,7 +26,14 @@ const Header = () => {
                 <Link to={page.path}>{page.title}</Link>
             </Text>
             ))}
+            
         </Flex>
+        <Text>
+                <LoginButton/>
+                <Profile/>
+                <LogoutButton />
+            </Text>
+                
         </Flex>
     </Box>
     );

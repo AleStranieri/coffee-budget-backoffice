@@ -85,9 +85,9 @@ const TransactionList = ({
 
   const [deleteTransaction, { deleteLoading, deleteError }] = useMutation(DELETE_TRANSACTION);
 
-  useEffect(() => {
-    refetch();
-  }, [refetch]);
+  // useEffect(() => {
+  //   refetch();
+  // }, [refetch]);
 
   if (loading) {
     return <p>Loading...</p>;
