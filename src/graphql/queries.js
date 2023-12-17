@@ -200,10 +200,7 @@ query GetRecurringTransactions($where: TransactionWhereInput, $options: Transact
         color
         name
       }
-      creator {
-        _id
-        email
-      }
+      userId
       createdAt
       description
       end_date
