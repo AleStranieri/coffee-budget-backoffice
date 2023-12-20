@@ -1,9 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
 import Transactions from './pages/Transactions';
 import TransactionForm from './pages/TransactionForm.js'; 
 import PaymentAccounts from './pages/PaymentAccounts';
@@ -14,12 +14,22 @@ import Categories from './pages/Categories';
 import CategoryForm from './pages/CategoryForm';
 
 const App = () => {
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    loginWithRedirect();
+    return <div>Loading...</div>;
+  }
+
   return (
     <Router>
       <Header />
       <Routes>
         <Route path="/" element={<Dashboard />} />
-        <Route exact path="/login" element={<Login />} />
         <Route exact path="/transactions" element={<Transactions />} />
         <Route exact path="/transactions/create" element={<TransactionForm />} />
         <Route exact path="/transactions/:id/edit" element={<TransactionForm />} />

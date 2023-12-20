@@ -1,14 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import LoginButton from './LoginButton';
-import Profile from './Profile';
-import LogoutButton from './LogoutButton';
+import { Box, Flex, Text, Stack } from '@chakra-ui/react';
+import AuthButton from './AuthButton';
 
 const Header = () => {
     const pages = [
     { title: 'Home', path: '/' },
-    { title: 'Login', path: '/login' },
     { title: 'Transactions', path: '/transactions' },
     { title: 'Recurring', path: '/recurring-transactions' },
     { title: 'Payment Accounts', path: '/payment-accounts' },
@@ -28,11 +25,9 @@ const Header = () => {
                 ))}
                 
             </Flex>
-            <Text>
-                <LoginButton/>    
-                <LogoutButton />
-            </Text>
-            {/* <Profile/> */}
+            <Stack direction='row'>
+                <AuthButton/>  
+            </Stack>
         </Flex>
     </Box>
     );

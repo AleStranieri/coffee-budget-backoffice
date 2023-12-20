@@ -10,7 +10,7 @@ import {  Box,
 import { useQuery, useMutation } from '@apollo/client';
 import { EditIcon } from '@chakra-ui/icons';
 import { GET_TRANSACTIONS } from '../graphql/queries';
-import { DELETE_TRANSACTION } from '../graphql/mutations';
+import { DELETE_TRANSACTION, SET_EXECUTED_TRANSACTION } from '../graphql/mutations';
 import Pagination from './Pagination';
 import CustomDateField from './CustomDateField';
 import BadgeTransactionStatus from './BadgeTransactionStatus';
@@ -84,6 +84,7 @@ const TransactionList = ({
   });
 
   const [deleteTransaction, { deleteLoading, deleteError }] = useMutation(DELETE_TRANSACTION);
+  const [setExecutedTransaction] = useMutation(SET_EXECUTED_TRANSACTION);
 
   // useEffect(() => {
   //   refetch();
@@ -122,6 +123,27 @@ const TransactionList = ({
     })
     .catch((error) => {
       console.error('Transaction deletion error:', error);
+    });
+  };
+
+  const handleSetExecuted = (id) => {
+    setExecutedTransaction({
+      variables: {
+        transactionId: id,
+      },
+    })
+    .then((response) => {
+      console.log('Transaction set to executed:', response.data.setExecutedTransaction);
+      toast({
+        title: 'Transaction set to executed',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+      refetch();
+    })
+    .catch((error) => {
+      console.error('Error setting transaction to executed:', error);
     });
   };
   
@@ -194,6 +216,11 @@ const TransactionList = ({
               <GridItem w='100%'>
                 <ButtonGroup ml="auto">
                   <Button
+                      colorScheme="green"
+                      size="sm"
+                      onClick={() => handleSetExecuted(transaction._id)}
+                    >Set Executed</Button>
+                  <Button
                     as={Link}
                     to={`/transactions/${transaction._id}/edit`}
                     colorScheme="teal" 
@@ -202,6 +229,7 @@ const TransactionList = ({
                     leftIcon={<EditIcon />}
                     >Edit</Button>
                     <ModalItemDelete key={transaction._id} itemId={transaction._id} onDelete={handleDelete} />
+                    
                 </ButtonGroup>
               </GridItem>
             </Grid>

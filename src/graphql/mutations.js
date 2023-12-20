@@ -30,6 +30,14 @@ export const DELETE_TRANSACTION = gql`
   }
 `;
 
+export const SET_EXECUTED_TRANSACTION = gql`
+  mutation SetExecutedTransaction($transactionId: ID!) {
+    setExecutedTransaction(transactionId: $transactionId) {
+      _id
+    }
+  }
+`;
+
 
 // Mutation for creating a debit payment account
 export const CREATE_DEBIT_PAYMENT_ACCOUNT = gql`
