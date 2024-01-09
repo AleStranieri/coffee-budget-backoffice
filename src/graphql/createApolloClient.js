@@ -23,4 +23,4 @@ const createApolloClient = (token) => {
   });
 };
 
-export default createApolloClient;
+export default createApolloClient; 
