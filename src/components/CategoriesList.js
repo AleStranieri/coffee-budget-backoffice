@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, useToast, Text, Link, HStack, VStack, Spacer, ButtonGroup } from '@chakra-ui/react';
 import { EditIcon, DeleteIcon } from '@chakra-ui/icons';
 import { useQuery, useMutation } from '@apollo/client';
@@ -7,11 +7,8 @@ import { DELETE_CATEGORY } from '../graphql/mutations';
 import { Link as RouterLink } from 'react-router-dom';
 
 const CategoriesList = () => {
-  const [currentPage, setCurrentPage] = useState(1);
   const toast = useToast();
-  const { loading, error, data, refetch } = useQuery(GET_CATEGORIES, {
-    variables: { options: { page: currentPage, limit: 10 } }, // Set limit as per your requirement
-  });
+  const { loading, error, data, refetch } = useQuery(GET_CATEGORIES);
   const [deleteCategory] = useMutation(DELETE_CATEGORY);
 
   const handleDelete = (id) => {
@@ -23,10 +20,6 @@ const CategoriesList = () => {
       .catch((error) => {
         console.error('Category deletion error:', error);
       });
-  };
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
   };
 
   if (loading) return <p>Loading...</p>;
