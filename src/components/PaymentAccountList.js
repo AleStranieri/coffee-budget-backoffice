@@ -27,7 +27,7 @@ const PaymentAccountList = () => {
     if (accountTypeFilter !== '') {
         variables.where = {
           ...variables.where,
-          type: accountTypeFilter,
+          nature: accountTypeFilter,
         };
       }
 
@@ -90,8 +90,8 @@ const PaymentAccountList = () => {
         <Box>
             <Select value={accountTypeFilter} onChange={handleFilterChange} mb={4}>
                 <option value="">All</option>
-                <option value="DEBIT">Debit</option>
-                <option value="CREDIT">Credit</option>
+                <option value="account">Debit</option>
+                <option value="credit_card">Credit</option>
             </Select>
           {paymentAccounts.map((paymentAccount) => (
             <Box
@@ -104,20 +104,20 @@ const PaymentAccountList = () => {
               display="flex"
               alignItems="center"
             >
-              {paymentAccount.type === 'DEBIT' ? (
+              {paymentAccount.nature === 'account' ? (
                 <FaCreditCard size={16} color="blue" style={{ marginRight: '8px' }} />
               ) : (
                 <FaCreditCard size={16} color="teal" style={{ marginRight: '8px' }} />
               )}
-              <Text style={{ marginRight: '8px' }}>{paymentAccount.name}</Text>
-              {paymentAccount.amount ? (
+              <Text style={{ marginRight: '8px' }}>{paymentAccount.name}-{paymentAccount.extra.account_name}</Text>
+              {paymentAccount.balance ? (
                  <Text
                  fontWeight='semibold'
-                  letterSpacing='wide'>[{paymentAccount.amount}]</Text>
+                  letterSpacing='wide'>[{paymentAccount.balance}]</Text>
               ) : (
                 <Text
                   fontWeight='semibold'
-                  letterSpacing='wide'>[{paymentAccount.spendingLimit}]</Text>
+                  letterSpacing='wide'>[{paymentAccount.extra.credit_limit}]</Text>
               )}
               <ButtonGroup ml="auto">
                 <Button

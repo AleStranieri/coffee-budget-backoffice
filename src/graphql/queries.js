@@ -63,12 +63,21 @@ export const GET_PAYMENT_ACCOUNTS = gql`
       docs {
         _id
         name
-        type
-        ... on DebitAccount {
-          amount
-        }
-        ... on CreditCardAccount {
-          spendingLimit
+        description
+        nature
+        balance
+        extra {
+          account_name
+          account_number
+          card_type
+          client_name
+          closing_balance
+          credit_limit
+          next_payment_amount
+          next_payment_date
+          statement_cut_date
+          total_payment_amount
+          payment_type
         }
       }
     }
@@ -81,25 +90,9 @@ export const GET_PAYMENT_ACCOUNT = gql`
       _id
       name
       description
-      type
-      ... on DebitAccount {
-        _id
-        amount
-        description
-        name
-      }
-      ... on CreditCardAccount {
-        _id
-        description
-        executionDate
-        name
-        spendingLimit
-        accountParent {
-          ... on DebitAccount {
-            _id
-          }
-        }
-      }
+      nature
+      extra
+      balance
     }
   }
 `;

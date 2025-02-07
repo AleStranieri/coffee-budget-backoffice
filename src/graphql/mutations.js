@@ -199,3 +199,16 @@ export const UPDATE_CATEGORY = gql`
     }
   }
 `;
+
+
+export const GET_SALTEDGE_AUTH_URL = gql`
+  mutation GetSaltEdgeAuthUrl {
+    getSaltEdgeAuthUrl
+  }
+`;
+
+export const SYNC_SALTEDGE_DATA = gql`
+  mutation syncSaltEdgeData {
+    syncSaltEdgeData
+  }
+`;
